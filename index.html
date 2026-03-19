@@ -333,7 +333,7 @@ function renderAuth(){
         if(n.isNotDisplayed()||n.isSkippedMoment()){
           // Show a message to the user
           const msg=document.getElementById('google-msg');
-          if(msg){msg.textContent='Google sign-in popup was blocked. Please allow popups for this site, or use Guest mode.';msg.style.display='block';}
+          if(msg){msg.textContent='Google blocked this site. In Google Console → Credentials → add your GitHub URL to Authorized JavaScript Origins.';msg.style.display='block';}
         }
       });
     } else {
@@ -358,7 +358,7 @@ function renderAuth(){
   w.append(gBtn,aBtn,el('div',{class:'auth-divider'},'OR'));
   w.appendChild(el('button',{class:'auth-btn auth-guest',onClick:()=>signIn('guest')},'Continue as guest (saved locally)'));
   const note=el('p',{style:{color:'var(--dim)',fontSize:'10px',textAlign:'center',marginTop:'20px',maxWidth:'300px',lineHeight:'1.6',padding:'0 8px'}});
-  note.innerHTML='Google sign-in requires the app to be hosted online (e.g. Netlify).<br>Use <strong>Guest</strong> to start now — your data is saved locally.';
+  note.innerHTML='To use Google sign-in: add your GitHub Pages URL to Google Console → Credentials → Authorized JavaScript Origins.<br>Use <strong>Guest</strong> to start now — your data is saved locally.';
   w.appendChild(note);
   const gmsg=el('div',{id:'google-msg',style:{display:'none',background:'rgba(255,159,10,.15)',border:'1px solid rgba(255,159,10,.4)',borderRadius:'12px',padding:'10px 14px',fontSize:'12px',color:'#FF9F0A',textAlign:'center',marginTop:'12px',maxWidth:'320px',lineHeight:'1.5'}});
   w.appendChild(gmsg);
@@ -553,16 +553,54 @@ function buildBuild(routine){
     } else {
       const list=el('div',{style:{padding:'14px 16px'}});
       if(!exs.length)list.appendChild(el('div',{style:{color:'var(--sub)',textAlign:'center',padding:'48px 0',fontSize:'14px'}},'Pick exercises in the previous tab'));
-      exs.forEach(ex=>{
-        const card=el('div',{style:{background:'var(--surf)',border:'1px solid var(--border)',borderRadius:'16px',padding:'16px',marginBottom:'10px'}});
-        const cr=el('div',{style:{display:'flex',justifyContent:'space-between',marginBottom:'12px'}});
-        cr.appendChild(el('div',{},el('div',{style:{fontSize:'14px',fontWeight:'700'}},ex.name),el('div',{style:{color:ex.skillColor,fontSize:'11px',marginTop:'2px'}},ex.skillName)));
-        const xb=el('button',{style:{background:'transparent',border:'none',cursor:'pointer',color:'var(--red)',fontSize:'22px'},onClick:()=>{exs=exs.filter(e=>e.id!==ex.id);usv();rb()}});xb.textContent='×';
-        cr.appendChild(xb);card.appendChild(cr);
-        const flds=el('div',{style:{display:'flex',gap:'10px'}});
-        [['Sets','customSets'],['Target','customTarget']].forEach(([l,k])=>{const f=el('div',{class:'field-box'});f.appendChild(el('div',{class:'field-label'},l.toUpperCase()));const inp=el('input',{type:'number',class:'field-input',value:ex[k]});inp.addEventListener('input',e=>{ex[k]=Number(e.target.value)});f.appendChild(inp);flds.appendChild(f)});
-        card.appendChild(flds);list.appendChild(card);
-      });
+      // Drag-to-reorder config list
+      let dragIdx=null;
+      function renderConfigList(){
+        list.innerHTML='';
+        if(!exs.length){list.appendChild(el('div',{style:{color:'var(--sub)',textAlign:'center',padding:'48px 0',fontSize:'14px'}},'Pick exercises in the previous tab'));return;}
+        exs.forEach((ex,idx)=>{
+          const card=el('div',{draggable:true,style:{background:'var(--surf)',border:'1px solid var(--border)',borderRadius:'16px',padding:'16px',marginBottom:'10px',cursor:'grab',userSelect:'none',transition:'opacity .15s,transform .15s'}});
+          card.addEventListener('dragstart',e=>{dragIdx=idx;card.style.opacity='.4';e.dataTransfer.effectAllowed='move';});
+          card.addEventListener('dragend',()=>{card.style.opacity='1';dragIdx=null;renderConfigList();});
+          card.addEventListener('dragover',e=>{e.preventDefault();if(dragIdx===null||dragIdx===idx)return;const moved=exs.splice(dragIdx,1)[0];exs.splice(idx,0,moved);dragIdx=idx;renderConfigList();});
+          // Touch drag support
+          let touchStartY=0,touchStartIdx=0;
+          card.addEventListener('touchstart',e=>{touchStartY=e.touches[0].clientY;touchStartIdx=idx;card.style.background='var(--card)';},{passive:true});
+          card.addEventListener('touchmove',e=>{
+            e.preventDefault();
+            const dy=e.touches[0].clientY-touchStartY;
+            const cards=[...list.children];
+            const cardH=card.offsetHeight+10;
+            const newIdx=Math.max(0,Math.min(exs.length-1,touchStartIdx+Math.round(dy/cardH)));
+            if(newIdx!==touchStartIdx){const moved=exs.splice(touchStartIdx,1)[0];exs.splice(newIdx,0,moved);touchStartIdx=newIdx;touchStartY=e.touches[0].clientY;renderConfigList();}
+          },{passive:false});
+          card.addEventListener('touchend',()=>{card.style.background='var(--surf)';});
+
+          const cr=el('div',{style:{display:'flex',alignItems:'center',gap:'10px',marginBottom:'12px'}});
+          // Order number
+          const numBadge=el('div',{style:{width:'26px',height:'26px',borderRadius:'8px',background:`color-mix(in srgb,${ex.skillColor} 18%,transparent)`,border:`1px solid color-mix(in srgb,${ex.skillColor} 35%,transparent)`,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:'0',color:ex.skillColor,fontSize:'12px',fontWeight:'800'}},String(idx+1));
+          // Drag handle
+          const handle=el('div',{style:{color:'var(--dim)',fontSize:'16px',cursor:'grab',flexShrink:'0',padding:'0 2px'}});
+          handle.innerHTML='<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="4" cy="3" r="1.5" fill="currentColor"/><circle cx="10" cy="3" r="1.5" fill="currentColor"/><circle cx="4" cy="7" r="1.5" fill="currentColor"/><circle cx="10" cy="7" r="1.5" fill="currentColor"/><circle cx="4" cy="11" r="1.5" fill="currentColor"/><circle cx="10" cy="11" r="1.5" fill="currentColor"/></svg>';
+          const info=el('div',{style:{flex:'1',minWidth:'0'}});
+          info.appendChild(el('div',{style:{fontSize:'14px',fontWeight:'700',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}},ex.name));
+          info.appendChild(el('div',{style:{color:ex.skillColor,fontSize:'11px',marginTop:'1px'}},ex.skillName));
+          const xb=el('button',{style:{background:'rgba(255,69,58,.12)',border:'none',borderRadius:'8px',width:'30px',height:'30px',cursor:'pointer',color:'var(--red)',fontSize:'16px',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:'0'},onClick:()=>{exs=exs.filter(e=>e.id!==ex.id);usv();renderConfigList();}});
+          xb.innerHTML='<svg width="14" height="14" viewBox="0 0 18 18" fill="none"><path d="M2 4H16M6 4V2H12V4M5 4L5.8 15H12.2L13 4" stroke="var(--red)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+          cr.append(numBadge,handle,info,xb);
+          card.appendChild(cr);
+          const flds=el('div',{style:{display:'flex',gap:'10px'}});
+          [['Sets','customSets'],['Target','customTarget']].forEach(([l,k])=>{
+            const f=el('div',{class:'field-box'});
+            f.appendChild(el('div',{class:'field-label'},l.toUpperCase()));
+            const inp=el('input',{type:'number',class:'field-input',value:ex[k]});
+            inp.addEventListener('input',e=>{ex[k]=Number(e.target.value);});
+            f.appendChild(inp);flds.appendChild(f);
+          });
+          card.appendChild(flds);list.appendChild(card);
+        });
+      }
+      renderConfigList();
       b.appendChild(list);
     }
   }
