@@ -178,36 +178,25 @@ const SKILLS=[
      desc:'Body perfectly horizontal, arms locked, legs together. The ultimate goal.'},
   ]},
   {id:'handstand_pu',name:'Handstand Push-Up',color:'var(--purple)',
-   desc:'Vertical pressing strength upside-down — from pike hold to freestanding HSPU.',
-   coach:'Thenics: master balance before adding reps. Chest-to-wall is the key preparatory drill.',
+   desc:'Full overhead press from a freestanding handstand — the ultimate vertical pushing skill.',
+   coach:'Master a 15s freestanding handstand hold before attempting HSPU. Strength and balance both required.',
    progs:[
-    {id:'hp1',name:'Pike Hold',lv:'beginner',sets:4,tgt:30,u:'s',img:()=>IMG.hp[0],
-     desc:'Hips elevated, legs straight, arms overhead. Builds shoulder pressing from an easier angle.'},
-    {id:'hp2',name:'Wall Walks',lv:'beginner+',sets:4,tgt:5,u:'reps',img:()=>IMG.hp[1],
-     desc:'Walk hands toward wall until near vertical. Builds inversion comfort and shoulder strength.'},
-    {id:'hp3',name:'Headstand',lv:'intermediate',sets:3,tgt:30,u:'s',img:()=>IMG.hp[2],
-     desc:'Head and two hands form a stable triangle. Develops inversion balance and body control.'},
-    {id:'hp4',name:'Wall Handstand',lv:'intermediate',sets:4,tgt:30,u:'s',img:()=>IMG.hp[3],
-     desc:'Full body inverted, back against wall. Develops shoulder endurance and body alignment.'},
-    {id:'hp5',name:'Adv. Wall Handstand',lv:'intermediate+',sets:4,tgt:20,u:'s',img:()=>IMG.hp[4],
-     desc:'Chest facing wall, body straight. Much closer to a free handstand — tighter, more demanding.'},
-    {id:'hp6',name:'Handstand',lv:'advanced',sets:4,tgt:15,u:'s',img:()=>IMG.hp[5],
-     desc:'Free-standing, fully balanced. Master balance here before adding pressing movement.'},
     {id:'hp7',name:'Handstand Push Up',lv:'elite',sets:3,tgt:3,u:'reps',img:()=>IMG.hp[6],
      desc:'Full overhead press from a handstand. Peak shoulder and tricep strength. The ultimate goal.'},
   ]},
   {id:'handstand',name:'Handstand Hold',color:'var(--lime)',
-   desc:'The freestanding two-arm handstand — balance, shoulder strength and alignment.',
+   desc:'The freestanding two-arm handstand — balance, shoulder strength and alignment. Includes all hold progressions from Pike to Freestanding.',
    coach:'GMB: 15–30 min daily, 3–5× per week. Wall work builds strength; kick-ups build balance.',
    progs:[
     {id:'hs1',name:'Wrist & Shoulder Prep',lv:'beginner',sets:3,tgt:60,u:'s',img:null,desc:'Wrist circles, prayer stretch, shoulder mobility. Non-negotiable before every session.'},
-    {id:'hs2',name:'Elevated Pike Hold',lv:'beginner',sets:4,tgt:30,u:'s',img:null,desc:'Feet on box, hips high, arms straight. Shoulders over wrists — safest inversion entry.'},
-    {id:'hs3',name:'Wall Walk-Up',lv:'beginner+',sets:4,tgt:5,u:'reps',img:null,desc:'From plank, walk feet up wall until arms locked. Build inversion comfort gradually.'},
-    {id:'hs4',name:'Back-to-Wall HS',lv:'intermediate',sets:4,tgt:30,u:'s',img:null,desc:'Back to wall, heels lightly touching. Teaches real alignment — hollow body is key.'},
-    {id:'hs5',name:'Chest-to-Wall HS',lv:'intermediate',sets:4,tgt:20,u:'s',img:null,desc:'Belly toward wall. Forces hollow position — more demanding but more transferable.'},
-    {id:'hs6',name:'Kick-Up Practice',lv:'intermediate+',sets:4,tgt:8,u:'reps',img:null,desc:'Controlled kick, not a jump. Learn to bail safely. Berg Movement: "controlled momentum."'},
-    {id:'hs7',name:'Wall Float',lv:'advanced',sets:4,tgt:5,u:'s',img:null,desc:'Peel heels from wall and balance freely. First real freestanding balance — fingertip control.'},
-    {id:'hs8',name:'Freestanding Handstand',lv:'elite',sets:3,tgt:30,u:'s',img:null,desc:'GMB: 30s clean hold = mastered. Finger pressure provides micro-corrections throughout.'},
+    {id:'hp1',name:'Pike Hold',lv:'beginner',sets:4,tgt:30,u:'s',img:()=>IMG.hp[0],desc:'Hips elevated, legs straight, arms overhead. Builds shoulder pressing from an easier angle.'},
+    {id:'hp2',name:'Wall Walks',lv:'beginner+',sets:4,tgt:5,u:'reps',img:()=>IMG.hp[1],desc:'Walk hands toward wall until near vertical. Builds inversion comfort and shoulder strength.'},
+    {id:'hp3',name:'Headstand',lv:'intermediate',sets:3,tgt:30,u:'s',img:()=>IMG.hp[2],desc:'Head and two hands form a stable triangle. Develops inversion balance and body control.'},
+    {id:'hp4',name:'Wall Handstand',lv:'intermediate',sets:4,tgt:30,u:'s',img:()=>IMG.hp[3],desc:'Full body inverted, back against wall. Develops shoulder endurance and body alignment.'},
+    {id:'hp5',name:'Adv. Wall Handstand',lv:'intermediate+',sets:4,tgt:20,u:'s',img:()=>IMG.hp[4],desc:'Chest facing wall, body straight. Much closer to a free handstand — tighter, more demanding.'},
+    {id:'hs6',name:'Kick-Up Practice',lv:'beginner',sets:4,tgt:8,u:'reps',img:null,desc:'Controlled kick, not a jump. Learn to bail safely. Berg Movement: "controlled momentum."'},
+    {id:'hp6',name:'Handstand',lv:'advanced',sets:4,tgt:15,u:'s',img:()=>IMG.hp[5],desc:'Free-standing, fully balanced. Master balance here before adding pressing movement.'},
+
   ]},
   {id:'muscle_up',name:'Muscle-Up',color:'var(--lime)',
    desc:'Pull above the bar and push over it — the signature street workout skill.',
@@ -273,6 +262,9 @@ SKILLS.forEach(sk=>{
 });
 function getImg(exId){ return IMG_MAP[exId]||null; }
 
+// Global color palette — assigned per exercise, travels with it on drag
+const CARD_COLORS=['#C8FF00','#0A84FF','#FF9F0A','#FF453A','#BF5AF2','#32D74B','#FF6B81','#5AC8FA','#FFD60A','#FF6B00'];
+
 /* ─── STORAGE ──────────────────────────────────────────────── */
 const KEY='skillsapp_v5';
 let S={user:null,bests:{},history:[],routines:[],tab:'skills'};
@@ -282,14 +274,14 @@ function pb(id,v){S.bests[id]=Math.max(S.bests[id]||0,v);save()}
 
 const DEF=[
   {id:'r1',name:'Push Day',exercises:[
-    {...ALL_EX.find(e=>e.id==='hp1'),customSets:4,customTarget:30},
-    {...ALL_EX.find(e=>e.id==='hs4'),customSets:4,customTarget:20},
-    {...ALL_EX.find(e=>e.id==='ls3'),customSets:3,customTarget:10},
+    {...ALL_EX.find(e=>e.id==='hp1'),customSets:4,customTarget:30,_color:'#C8FF00'},
+    {...ALL_EX.find(e=>e.id==='hs4'),customSets:4,customTarget:20,_color:'#0A84FF'},
+    {...ALL_EX.find(e=>e.id==='ls3'),customSets:3,customTarget:10,_color:'#FF9F0A'},
   ]},
   {id:'r2',name:'Pull Day',exercises:[
-    {...ALL_EX.find(e=>e.id==='mu4'),customSets:4,customTarget:8},
-    {...ALL_EX.find(e=>e.id==='fl1'),customSets:4,customTarget:15},
-    {...ALL_EX.find(e=>e.id==='bl2'),customSets:3,customTarget:20},
+    {...ALL_EX.find(e=>e.id==='mu4'),customSets:4,customTarget:8,_color:'#C8FF00'},
+    {...ALL_EX.find(e=>e.id==='fl1'),customSets:4,customTarget:15,_color:'#0A84FF'},
+    {...ALL_EX.find(e=>e.id==='bl2'),customSets:3,customTarget:20,_color:'#FF9F0A'},
   ]},
 ];
 
@@ -345,6 +337,7 @@ function renderAuth(){
           clearInterval(check);
           gBtn.disabled=false;
           gBtn.innerHTML=`<svg viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>Continue with Google`;
+  gBtnWrap.appendChild(gBtn);
           google.accounts.id.prompt();
         }
       },300);
@@ -508,6 +501,8 @@ function buildRoutinesTab(){
 /* ─── BUILD ─────────────────────────────────────────────────── */
 function buildBuild(routine){
   let nm=routine?.name||'',exs=routine?JSON.parse(JSON.stringify(routine.exercises)):[];
+  // Ensure all exercises have a _color assigned
+  exs.forEach((ex,i)=>{if(!ex._color)ex._color=CARD_COLORS[i%CARD_COLORS.length];});
   let tab='pick',selSk=SKILLS[0];
   const w=el('div',{class:'fade-in',style:{minHeight:'100vh',display:'flex',flexDirection:'column',background:'var(--bg)'}});
   const hdr=el('div',{style:{background:'var(--surf)',padding:'52px 20px 14px',borderBottom:'1px solid var(--border)',flexShrink:'0'}});
@@ -537,7 +532,7 @@ function buildBuild(routine){
       selSk.progs.forEach((p,i)=>{
         const isSel=selIds.has(p.id);
         const row=el('div',{style:{display:'flex',alignItems:'center',gap:'12px',background:isSel?`color-mix(in srgb,${selSk.color} 8%,transparent)`:'var(--surf)',border:`1px solid ${isSel?`color-mix(in srgb,${selSk.color} 44%,transparent)`:'var(--border)'}`,borderRadius:'14px',padding:'12px',marginBottom:'8px',cursor:'pointer'},
-          onClick:()=>{if(isSel)exs=exs.filter(e=>e.id!==p.id);else exs.push({...p,skillId:selSk.id,skillName:selSk.name,skillColor:selSk.color,customSets:p.sets,customTarget:p.tgt});usv();sw('pick')}});
+          onClick:()=>{if(isSel){exs=exs.filter(e=>e.id!==p.id);}else{const usedColors=new Set(exs.map(e=>e._color));const availColors=CARD_COLORS.filter(c=>!usedColors.has(c));const assignedColor=availColors.length>0?availColors[0]:CARD_COLORS[exs.length%CARD_COLORS.length];exs.push({...p,skillId:selSk.id,skillName:selSk.name,skillColor:selSk.color,customSets:p.sets,customTarget:p.tgt,_color:assignedColor});}usv();sw('pick')}});
         const chk=el('div',{style:{width:'24px',height:'24px',borderRadius:'7px',background:isSel?'var(--lime)':'var(--card)',border:`1.5px solid ${isSel?'var(--lime)':'var(--border)'}`,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:'0'}});
         chk.innerHTML=isSel?`<svg width="12" height="12" viewBox="0 0 18 18" fill="none"><path d="M3 9L7 13L15 5" stroke="#000" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`:`<span style="font-size:9px;color:var(--dim)">${i+1}</span>`;
         const at=el('div',{style:{width:'56px',height:'44px',background:'#252528',borderRadius:'8px',display:'flex',alignItems:'center',justifyContent:'center',overflow:'hidden',flexShrink:'0'}});
@@ -553,32 +548,172 @@ function buildBuild(routine){
     } else {
       const list=el('div',{style:{padding:'14px 16px'}});
       if(!exs.length)list.appendChild(el('div',{style:{color:'var(--sub)',textAlign:'center',padding:'48px 0',fontSize:'14px'}},'Pick exercises in the previous tab'));
-      // Drag-to-reorder config list
-      let dragIdx=null;
+      // Animated drag-to-reorder — FLIP technique for smooth animations
+      let dragIdx=null, dragEl=null, placeholder=null;
+
+      function animateSwap(movedCard, fromY, toY){
+        const dy=fromY-toY;
+        movedCard.style.transition='none';
+        movedCard.style.transform=`translateY(${dy}px)`;
+        requestAnimationFrame(()=>{
+          movedCard.style.transition='transform 0.22s cubic-bezier(0.25,0.46,0.45,0.94)';
+          movedCard.style.transform='translateY(0)';
+        });
+      }
+
       function renderConfigList(){
         list.innerHTML='';
         if(!exs.length){list.appendChild(el('div',{style:{color:'var(--sub)',textAlign:'center',padding:'48px 0',fontSize:'14px'}},'Pick exercises in the previous tab'));return;}
+        // Drag hint
+        const hint=el('div',{style:{display:'flex',alignItems:'center',gap:'6px',color:'var(--dim)',fontSize:'11px',marginBottom:'14px',padding:'8px 12px',background:'var(--card)',borderRadius:'10px'}});
+        hint.innerHTML=`<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="4" cy="3" r="1.3" fill="currentColor"/><circle cx="10" cy="3" r="1.3" fill="currentColor"/><circle cx="4" cy="7" r="1.3" fill="currentColor"/><circle cx="10" cy="7" r="1.3" fill="currentColor"/><circle cx="4" cy="11" r="1.3" fill="currentColor"/><circle cx="10" cy="11" r="1.3" fill="currentColor"/></svg> Hold and drag to reorder`;
+        list.appendChild(hint);
+
+        // Record positions before rendering (for FLIP)
+        const oldPositions={};
+        list.querySelectorAll('[data-exid]').forEach(c=>{
+          oldPositions[c.dataset.exid]=c.getBoundingClientRect().top;
+        });
+
         exs.forEach((ex,idx)=>{
-          const card=el('div',{draggable:true,style:{background:'var(--surf)',border:'1px solid var(--border)',borderRadius:'16px',padding:'16px',marginBottom:'10px',cursor:'grab',userSelect:'none',transition:'opacity .15s,transform .15s'}});
-          card.addEventListener('dragstart',e=>{dragIdx=idx;card.style.opacity='.4';e.dataTransfer.effectAllowed='move';});
-          card.addEventListener('dragend',()=>{card.style.opacity='1';dragIdx=null;renderConfigList();});
-          card.addEventListener('dragover',e=>{e.preventDefault();if(dragIdx===null||dragIdx===idx)return;const moved=exs.splice(dragIdx,1)[0];exs.splice(idx,0,moved);dragIdx=idx;renderConfigList();});
-          // Touch drag support
-          let touchStartY=0,touchStartIdx=0;
-          card.addEventListener('touchstart',e=>{touchStartY=e.touches[0].clientY;touchStartIdx=idx;card.style.background='var(--card)';},{passive:true});
+          if(!ex._color) ex._color=CARD_COLORS[idx%CARD_COLORS.length];
+          const cardColor=ex._color;
+          const card=el('div',{draggable:true});
+          card.dataset.exid=ex.id;
+          card.dataset.idx=String(idx);
+          Object.assign(card.style,{
+            background:`color-mix(in srgb,${cardColor} 6%,var(--surf))`,
+            border:`1px solid color-mix(in srgb,${cardColor} 35%,var(--border))`,
+            borderRadius:'16px',padding:'16px',marginBottom:'10px',
+            cursor:'grab',userSelect:'none',
+            transition:'transform 0.22s cubic-bezier(0.25,0.46,0.45,0.94), opacity 0.2s, box-shadow 0.2s',
+            willChange:'transform',
+          });
+
+          // ── Mouse/Desktop drag ────────────────────────────────────────────
+          card.addEventListener('dragstart',e=>{
+            dragIdx=idx; dragEl=card;
+            card.style.opacity='0.45';
+            card.style.transform='scale(0.97) rotate(1deg)';
+            e.dataTransfer.effectAllowed='move';
+            e.dataTransfer.setData('text/plain','');
+          });
+          card.addEventListener('dragend',()=>{
+            card.style.opacity='1';
+            card.style.transform='';
+            dragIdx=null; dragEl=null;
+            renderConfigList();
+          });
+          card.addEventListener('dragover',e=>{
+            e.preventDefault();
+            if(dragIdx===null||dragIdx===Number(card.dataset.idx)) return;
+            // Record current positions for FLIP
+            const cards=[...list.querySelectorAll('[data-exid]')];
+            const before={};
+            cards.forEach(c=>{ before[c.dataset.exid]=c.getBoundingClientRect().top; });
+            // Do the swap
+            const moved=exs.splice(dragIdx,1)[0];
+            const newIdx=Number(card.dataset.idx);
+            exs.splice(newIdx,0,moved);
+            dragIdx=newIdx;
+            // Re-render
+            renderConfigList();
+            // FLIP: animate from old to new position
+            list.querySelectorAll('[data-exid]').forEach(c=>{
+              const oldTop=before[c.dataset.exid];
+              if(oldTop===undefined) return;
+              const newTop=c.getBoundingClientRect().top;
+              const dy=oldTop-newTop;
+              if(Math.abs(dy)>1){
+                c.style.transition='none';
+                c.style.transform=`translateY(${dy}px)`;
+                requestAnimationFrame(()=>{
+                  c.style.transition='transform 0.22s cubic-bezier(0.25,0.46,0.45,0.94)';
+                  c.style.transform='translateY(0)';
+                });
+              }
+            });
+          });
+
+          // ── Touch drag ───────────────────────────────────────────────────
+          let touchStartY=0, touchCurIdx=idx, longPressTimer=null, touchActive=false;
+          card.addEventListener('touchstart',e=>{
+            touchStartY=e.touches[0].clientY;
+            touchCurIdx=idx;
+            touchActive=false;
+            longPressTimer=setTimeout(()=>{
+              touchActive=true;
+              card.style.transform='scale(1.03) rotate(1deg)';
+              card.style.boxShadow=`0 12px 40px color-mix(in srgb,${cardColor} 50%,transparent)`;
+              card.style.zIndex='100';
+              card.style.position='relative';
+              // Haptic if available
+              if(navigator.vibrate) navigator.vibrate(30);
+            },200);
+          },{passive:true});
+
           card.addEventListener('touchmove',e=>{
+            if(!touchActive){ clearTimeout(longPressTimer); return; }
             e.preventDefault();
             const dy=e.touches[0].clientY-touchStartY;
-            const cards=[...list.children];
             const cardH=card.offsetHeight+10;
-            const newIdx=Math.max(0,Math.min(exs.length-1,touchStartIdx+Math.round(dy/cardH)));
-            if(newIdx!==touchStartIdx){const moved=exs.splice(touchStartIdx,1)[0];exs.splice(newIdx,0,moved);touchStartIdx=newIdx;touchStartY=e.touches[0].clientY;renderConfigList();}
+            const delta=Math.round(dy/cardH);
+            const newIdx=Math.max(0,Math.min(exs.length-1,touchCurIdx+delta));
+            if(newIdx!==touchCurIdx){
+              // Capture old positions for FLIP on all OTHER cards
+              const cards=[...list.querySelectorAll('[data-exid]')];
+              const before={};
+              cards.forEach(c=>{ if(c!==card) before[c.dataset.exid]=c.getBoundingClientRect().top; });
+
+              const moved=exs.splice(touchCurIdx,1)[0];
+              exs.splice(newIdx,0,moved);
+              const oldTouchCur=touchCurIdx;
+              touchCurIdx=newIdx;
+              touchStartY=e.touches[0].clientY;
+
+              // Re-render keeping dragged card in DOM by re-attaching
+              renderConfigList();
+
+              // FLIP animate other cards
+              list.querySelectorAll('[data-exid]').forEach(c=>{
+                const oldTop=before[c.dataset.exid];
+                if(oldTop===undefined) return;
+                const newTop=c.getBoundingClientRect().top;
+                const dy2=oldTop-newTop;
+                if(Math.abs(dy2)>1){
+                  c.style.transition='none';
+                  c.style.transform=`translateY(${dy2}px)`;
+                  requestAnimationFrame(()=>{
+                    c.style.transition='transform 0.2s cubic-bezier(0.25,0.46,0.45,0.94)';
+                    c.style.transform='translateY(0)';
+                  });
+                }
+              });
+
+              // Re-apply dragged style to new card at touchCurIdx
+              const dragged=list.querySelector(`[data-exid="${moved.id}"]`);
+              if(dragged){
+                dragged.style.transform='scale(1.03) rotate(1deg)';
+                dragged.style.boxShadow=`0 12px 40px color-mix(in srgb,${moved._color||cardColor} 50%,transparent)`;
+                dragged.style.zIndex='100';
+                dragged.style.position='relative';
+              }
+            }
           },{passive:false});
-          card.addEventListener('touchend',()=>{card.style.background='var(--surf)';});
+
+          card.addEventListener('touchend',()=>{
+            clearTimeout(longPressTimer);
+            touchActive=false;
+            card.style.transform='scale(1)';
+            card.style.boxShadow='none';
+            card.style.zIndex='';
+            card.style.position='';
+            renderConfigList();
+          });
 
           const cr=el('div',{style:{display:'flex',alignItems:'center',gap:'10px',marginBottom:'12px'}});
           // Order number
-          const numBadge=el('div',{style:{width:'26px',height:'26px',borderRadius:'8px',background:`color-mix(in srgb,${ex.skillColor} 18%,transparent)`,border:`1px solid color-mix(in srgb,${ex.skillColor} 35%,transparent)`,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:'0',color:ex.skillColor,fontSize:'12px',fontWeight:'800'}},String(idx+1));
+          const numBadge=el('div',{style:{width:'28px',height:'28px',borderRadius:'9px',background:`color-mix(in srgb,${cardColor} 25%,transparent)`,border:`1.5px solid ${cardColor}`,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:'0',color:cardColor,fontSize:'13px',fontWeight:'900'}},String(idx+1));
           // Drag handle
           const handle=el('div',{style:{color:'var(--dim)',fontSize:'16px',cursor:'grab',flexShrink:'0',padding:'0 2px'}});
           handle.innerHTML='<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="4" cy="3" r="1.5" fill="currentColor"/><circle cx="10" cy="3" r="1.5" fill="currentColor"/><circle cx="4" cy="7" r="1.5" fill="currentColor"/><circle cx="10" cy="7" r="1.5" fill="currentColor"/><circle cx="4" cy="11" r="1.5" fill="currentColor"/><circle cx="10" cy="11" r="1.5" fill="currentColor"/></svg>';
@@ -814,15 +949,26 @@ document.addEventListener('DOMContentLoaded',()=>{
       google.accounts.id.initialize({
         client_id:'YOUR_GOOGLE_CLIENT_ID',
         callback:(resp)=>{
-          if(S.user&&S.user.provider==='google')return; // already logged in
-          const payload=JSON.parse(atob(resp.credential.split('.')[1]));
-          S.user={name:payload.name,email:payload.email,provider:'google',avatar:(payload.name||'G')[0].toUpperCase(),bg:'var(--blue)',googleToken:resp.credential};
-          if(!S.routines.length)S.routines=JSON.parse(JSON.stringify(DEF));
-          save();renderMain();
+          try{
+            const payload=JSON.parse(atob(resp.credential.split('.')[1]));
+            S.user={name:payload.name,email:payload.email,provider:'google',avatar:(payload.name||'G')[0].toUpperCase(),bg:'var(--blue)'};
+            if(!S.routines.length)S.routines=JSON.parse(JSON.stringify(DEF));
+            save();renderMain();
+          }catch(e){console.error('Google auth error',e);}
         },
-        auto_select:true
+        auto_select:false,
+        cancel_on_tap_outside:false,
+        itp_support:true
       });
-      // Only auto-prompt if not already logged in
+      // Render the official Google button (most reliable method)
+      const wrap=document.getElementById('g-btn-wrap');
+      if(wrap&&!S.user){
+        wrap.innerHTML='';
+        google.accounts.id.renderButton(wrap,{
+          theme:'filled_black',shape:'pill',size:'large',width:'340',text:'continue_with',logo_alignment:'left'
+        });
+      }
+      // Also auto-select if returning user
       if(!S.user) google.accounts.id.prompt();
     }
   };
