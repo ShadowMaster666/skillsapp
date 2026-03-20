@@ -635,80 +635,139 @@ function buildBuild(routine){
             });
           });
 
-          // ── Touch drag ───────────────────────────────────────────────────
-          let touchStartY=0, touchCurIdx=idx, longPressTimer=null, touchActive=false;
+          // ── Touch drag — ghost floats above, drop on release ────────────
+          let touchStartY=0, touchCurY=0, touchOrigIdx=idx;
+          let longPressTimer=null, touchActive=false, ghostEl=null, dropTargetIdx=idx;
+
           card.addEventListener('touchstart',e=>{
             touchStartY=e.touches[0].clientY;
-            touchCurIdx=idx;
+            touchCurY=touchStartY;
+            touchOrigIdx=idx;
+            dropTargetIdx=idx;
             touchActive=false;
             longPressTimer=setTimeout(()=>{
               touchActive=true;
-              card.style.transform='scale(1.03) rotate(1deg)';
-              card.style.boxShadow=`0 12px 40px color-mix(in srgb,${cardColor} 50%,transparent)`;
-              card.style.zIndex='100';
-              card.style.position='relative';
-              // Haptic if available
-              if(navigator.vibrate) navigator.vibrate(30);
-            },200);
+              if(navigator.vibrate) navigator.vibrate([25,30,10]);
+              // Create ghost that floats with finger — full opacity, elevated
+              const rect=card.getBoundingClientRect();
+              ghostEl=card.cloneNode(true);
+              Object.assign(ghostEl.style,{
+                position:'fixed',
+                left:rect.left+'px',
+                top:rect.top+'px',
+                width:rect.width+'px',
+                zIndex:'9999',
+                pointerEvents:'none',
+                transform:'scale(1.05) rotate(1.5deg)',
+                boxShadow:`0 20px 60px rgba(0,0,0,0.6), 0 0 0 2px ${cardColor}`,
+                opacity:'1',
+                transition:'box-shadow 0.15s',
+                borderRadius:'16px',
+              });
+              document.body.appendChild(ghostEl);
+              // Original stays but fades to show the "slot"
+              card.style.opacity='0.15';
+              card.style.transform='scale(0.95)';
+            },180);
           },{passive:true});
 
           card.addEventListener('touchmove',e=>{
             if(!touchActive){ clearTimeout(longPressTimer); return; }
             e.preventDefault();
-            const dy=e.touches[0].clientY-touchStartY;
-            const cardH=card.offsetHeight+10;
-            const delta=Math.round(dy/cardH);
-            const newIdx=Math.max(0,Math.min(exs.length-1,touchCurIdx+delta));
-            if(newIdx!==touchCurIdx){
-              // Capture old positions for FLIP on all OTHER cards
-              const cards=[...list.querySelectorAll('[data-exid]')];
-              const before={};
-              cards.forEach(c=>{ if(c!==card) before[c.dataset.exid]=c.getBoundingClientRect().top; });
+            const touch=e.touches[0];
+            const dy=touch.clientY-touchCurY;
+            touchCurY=touch.clientY;
 
-              const moved=exs.splice(touchCurIdx,1)[0];
-              exs.splice(newIdx,0,moved);
-              const oldTouchCur=touchCurIdx;
-              touchCurIdx=newIdx;
-              touchStartY=e.touches[0].clientY;
-
-              // Re-render keeping dragged card in DOM by re-attaching
-              renderConfigList();
-
-              // FLIP animate other cards
-              list.querySelectorAll('[data-exid]').forEach(c=>{
-                const oldTop=before[c.dataset.exid];
-                if(oldTop===undefined) return;
-                const newTop=c.getBoundingClientRect().top;
-                const dy2=oldTop-newTop;
-                if(Math.abs(dy2)>1){
-                  c.style.transition='none';
-                  c.style.transform=`translateY(${dy2}px)`;
-                  requestAnimationFrame(()=>{
-                    c.style.transition='transform 0.2s cubic-bezier(0.25,0.46,0.45,0.94)';
-                    c.style.transform='translateY(0)';
-                  });
-                }
-              });
-
-              // Re-apply dragged style to new card at touchCurIdx
-              const dragged=list.querySelector(`[data-exid="${moved.id}"]`);
-              if(dragged){
-                dragged.style.transform='scale(1.03) rotate(1deg)';
-                dragged.style.boxShadow=`0 12px 40px color-mix(in srgb,${moved._color||cardColor} 50%,transparent)`;
-                dragged.style.zIndex='100';
-                dragged.style.position='relative';
-              }
+            // Move ghost with finger
+            if(ghostEl){
+              const curTop=parseFloat(ghostEl.style.top)||0;
+              ghostEl.style.top=(curTop+dy)+'px';
             }
+
+            // Find which slot the ghost is hovering over (drop target)
+            // — no re-ordering yet, just highlight the target slot
+            const allCards=[...list.querySelectorAll('[data-exid]')];
+            let newTarget=touchOrigIdx;
+            allCards.forEach((c,ci)=>{
+              const rect=c.getBoundingClientRect();
+              if(touch.clientY>=rect.top && touch.clientY<=rect.bottom){
+                newTarget=ci;
+              }
+            });
+
+            if(newTarget!==dropTargetIdx){
+              // Remove highlight from old target
+              const oldTarget=list.querySelector('[data-idx="'+dropTargetIdx+'"]');
+              if(oldTarget&&oldTarget!==card){
+                oldTarget.style.transform='';
+                oldTarget.style.borderColor='';
+              }
+              dropTargetIdx=newTarget;
+              if(navigator.vibrate) navigator.vibrate([6]);
+            }
+
+            // Highlight current drop target
+            allCards.forEach((c,ci)=>{
+              if(c===card) return;
+              const isTarget=ci===dropTargetIdx;
+              c.style.transform=isTarget?'scale(1.02)':'';
+              c.style.border=isTarget?`2px solid ${cardColor}`:'';
+            });
+
           },{passive:false});
 
           card.addEventListener('touchend',()=>{
             clearTimeout(longPressTimer);
+            if(ghostEl){ ghostEl.remove(); ghostEl=null; }
+            if(!touchActive){ touchActive=false; return; }
             touchActive=false;
-            card.style.transform='scale(1)';
-            card.style.boxShadow='none';
-            card.style.zIndex='';
-            card.style.position='';
-            renderConfigList();
+
+            // Remove all highlights
+            list.querySelectorAll('[data-exid]').forEach(c=>{
+              c.style.transform=''; c.style.border='';
+            });
+
+            // If drop target is different from origin — do the move with animation
+            if(dropTargetIdx!==touchOrigIdx){
+              // Snapshot positions for FLIP
+              const before={};
+              list.querySelectorAll('[data-exid]').forEach(c=>{
+                before[c.dataset.exid]=c.getBoundingClientRect().top;
+              });
+
+              // Move in data array
+              const moved=exs.splice(touchOrigIdx,1)[0];
+              exs.splice(dropTargetIdx,0,moved);
+              if(navigator.vibrate) navigator.vibrate([15]);
+
+              renderConfigList();
+
+              // FLIP animate all cards to new positions
+              list.querySelectorAll('[data-exid]').forEach(c=>{
+                const oldTop=before[c.dataset.exid];
+                if(oldTop==null) return;
+                const newTop=c.getBoundingClientRect().top;
+                const diff=oldTop-newTop;
+                if(Math.abs(diff)>2){
+                  c.style.transition='none';
+                  c.style.transform=`translateY(${diff}px)`;
+                  requestAnimationFrame(()=>{
+                    c.style.transition='transform 0.28s cubic-bezier(0.34,1.2,0.64,1)';
+                    c.style.transform='translateY(0)';
+                  });
+                }
+              });
+            } else {
+              card.style.opacity='';
+              card.style.transform='';
+            }
+          });
+          card.addEventListener('touchcancel',()=>{
+            clearTimeout(longPressTimer);
+            if(ghostEl){ ghostEl.remove(); ghostEl=null; }
+            touchActive=false;
+            list.querySelectorAll('[data-exid]').forEach(c=>{ c.style.transform=''; c.style.border=''; });
+            card.style.opacity=''; card.style.transform='';
           });
 
           const cr=el('div',{style:{display:'flex',alignItems:'center',gap:'10px',marginBottom:'12px'}});
