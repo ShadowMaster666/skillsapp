@@ -265,11 +265,450 @@ function getImg(exId){ return IMG_MAP[exId]||null; }
 // Global color palette — assigned per exercise, travels with it on drag
 const CARD_COLORS=['#C8FF00','#0A84FF','#FF9F0A','#FF453A','#BF5AF2','#32D74B','#FF6B81','#5AC8FA','#FFD60A','#FF6B00'];
 
+/* ─── GUIDED WORKOUTS (5–6 exercises, ~25–30 min each) ───────────────────────
+   One suggested workout per progression level per skill.
+   Each session = main skill work + complementary exercises.
+─────────────────────────────────────────────────────────────────────────────── */
+const GUIDED={
+  front_lever:[
+    {progId:'fl1',label:'Tuck Front Lever Session',exercises:[
+      {id:'fl1',name:'Tuck Front Lever',skillId:'front_lever',skillName:'Front Lever',skillColor:'var(--blue)',customSets:4,customTarget:15,u:'s'},
+      {id:'mu2',name:'Scapular Pull-Up',skillId:'muscle_up',skillName:'Muscle-Up',skillColor:'var(--lime)',customSets:3,customTarget:10,u:'reps'},
+      {id:'mu4',name:'Pull-Up',skillId:'muscle_up',skillName:'Muscle-Up',skillColor:'var(--lime)',customSets:4,customTarget:8,u:'reps'},
+      {id:'bl1',name:'Skin the Cat',skillId:'back_lever',skillName:'Back Lever',skillColor:'var(--red)',customSets:3,customTarget:5,u:'reps'},
+      {id:'ls3',name:'Tuck L-Sit',skillId:'lsit',skillName:'L-Sit',skillColor:'var(--green)',customSets:3,customTarget:10,u:'s'},
+      {id:'mu1',name:'Dead Hang',skillId:'muscle_up',skillName:'Muscle-Up',skillColor:'var(--lime)',customSets:3,customTarget:30,u:'s'},
+    ]},
+    {progId:'fl2',label:'Adv. Tuck Front Lever Session',exercises:[
+      {id:'fl2',name:'Adv. Tuck Front Lever',skillId:'front_lever',skillName:'Front Lever',skillColor:'var(--blue)',customSets:4,customTarget:12,u:'s'},
+      {id:'fl1',name:'Tuck Front Lever',skillId:'front_lever',skillName:'Front Lever',skillColor:'var(--blue)',customSets:2,customTarget:15,u:'s'},
+      {id:'mu4',name:'Pull-Up',skillId:'muscle_up',skillName:'Muscle-Up',skillColor:'var(--lime)',customSets:4,customTarget:10,u:'reps'},
+      {id:'mu5',name:'Chest-to-Bar Pull-Up',skillId:'muscle_up',skillName:'Muscle-Up',skillColor:'var(--lime)',customSets:3,customTarget:5,u:'reps'},
+      {id:'ls4',name:'One-Leg L-Sit',skillId:'lsit',skillName:'L-Sit',skillColor:'var(--green)',customSets:3,customTarget:8,u:'s'},
+      {id:'bl2',name:'German Hang',skillId:'back_lever',skillName:'Back Lever',skillColor:'var(--red)',customSets:3,customTarget:20,u:'s'},
+    ]},
+    {progId:'fl3',label:'Super Adv. Tuck Session',exercises:[
+      {id:'fl3',name:'Super Adv. Tuck',skillId:'front_lever',skillName:'Front Lever',skillColor:'var(--blue)',customSets:4,customTarget:10,u:'s'},
+      {id:'fl2',name:'Adv. Tuck Front Lever',skillId:'front_lever',skillName:'Front Lever',skillColor:'var(--blue)',customSets:2,customTarget:12,u:'s'},
+      {id:'mu5',name:'Chest-to-Bar Pull-Up',skillId:'muscle_up',skillName:'Muscle-Up',skillColor:'var(--lime)',customSets:4,customTarget:6,u:'reps'},
+      {id:'bl3',name:'Tuck Back Lever',skillId:'back_lever',skillName:'Back Lever',skillColor:'var(--red)',customSets:3,customTarget:8,u:'s'},
+      {id:'ls5',name:'Full L-Sit',skillId:'lsit',skillName:'L-Sit',skillColor:'var(--green)',customSets:3,customTarget:8,u:'s'},
+      {id:'mu6',name:'High Pull-Up',skillId:'muscle_up',skillName:'Muscle-Up',skillColor:'var(--lime)',customSets:3,customTarget:4,u:'reps'},
+    ]},
+    {progId:'fl4',label:'Straddle Half Lay Session',exercises:[
+      {id:'fl4',name:'Straddle Half Lay',skillId:'front_lever',skillName:'Front Lever',skillColor:'var(--blue)',customSets:4,customTarget:8,u:'s'},
+      {id:'fl3',name:'Super Adv. Tuck',skillId:'front_lever',skillName:'Front Lever',skillColor:'var(--blue)',customSets:2,customTarget:10,u:'s'},
+      {id:'mu6',name:'High Pull-Up',skillId:'muscle_up',skillName:'Muscle-Up',skillColor:'var(--lime)',customSets:4,customTarget:4,u:'reps'},
+      {id:'bl4',name:'Half Layout',skillId:'back_lever',skillName:'Back Lever',skillColor:'var(--red)',customSets:3,customTarget:6,u:'s'},
+      {id:'ls5',name:'Full L-Sit',skillId:'lsit',skillName:'L-Sit',skillColor:'var(--green)',customSets:3,customTarget:8,u:'s'},
+      {id:'mu5',name:'Chest-to-Bar Pull-Up',skillId:'muscle_up',skillName:'Muscle-Up',skillColor:'var(--lime)',customSets:3,customTarget:5,u:'reps'},
+    ]},
+    {progId:'fl5',label:'Front Lever Half Lay Session',exercises:[
+      {id:'fl5',name:'Front Lever Half Lay',skillId:'front_lever',skillName:'Front Lever',skillColor:'var(--blue)',customSets:4,customTarget:6,u:'s'},
+      {id:'fl4',name:'Straddle Half Lay',skillId:'front_lever',skillName:'Front Lever',skillColor:'var(--blue)',customSets:2,customTarget:8,u:'s'},
+      {id:'mu6',name:'High Pull-Up',skillId:'muscle_up',skillName:'Muscle-Up',skillColor:'var(--lime)',customSets:4,customTarget:4,u:'reps'},
+      {id:'bl5',name:'Straddle Back Lever',skillId:'back_lever',skillName:'Back Lever',skillColor:'var(--red)',customSets:3,customTarget:5,u:'s'},
+      {id:'ls6',name:'Straddle L-Sit',skillId:'lsit',skillName:'L-Sit',skillColor:'var(--green)',customSets:3,customTarget:8,u:'s'},
+      {id:'mu7',name:'Negative Muscle-Up',skillId:'muscle_up',skillName:'Muscle-Up',skillColor:'var(--lime)',customSets:3,customTarget:3,u:'reps'},
+    ]},
+    {progId:'fl6',label:'Straddle Front Lever Session',exercises:[
+      {id:'fl6',name:'Straddle Front Lever',skillId:'front_lever',skillName:'Front Lever',skillColor:'var(--blue)',customSets:4,customTarget:5,u:'s'},
+      {id:'fl5',name:'Front Lever Half Lay',skillId:'front_lever',skillName:'Front Lever',skillColor:'var(--blue)',customSets:2,customTarget:6,u:'s'},
+      {id:'mu7',name:'Negative Muscle-Up',skillId:'muscle_up',skillName:'Muscle-Up',skillColor:'var(--lime)',customSets:4,customTarget:3,u:'reps'},
+      {id:'bl5',name:'Straddle Back Lever',skillId:'back_lever',skillName:'Back Lever',skillColor:'var(--red)',customSets:3,customTarget:5,u:'s'},
+      {id:'ls7',name:'V-Sit',skillId:'lsit',skillName:'L-Sit',skillColor:'var(--green)',customSets:3,customTarget:5,u:'s'},
+      {id:'mu8',name:'Strict Muscle-Up',skillId:'muscle_up',skillName:'Muscle-Up',skillColor:'var(--lime)',customSets:3,customTarget:2,u:'reps'},
+    ]},
+    {progId:'fl7',label:'Full Front Lever Session',exercises:[
+      {id:'fl7',name:'Front Lever',skillId:'front_lever',skillName:'Front Lever',skillColor:'var(--blue)',customSets:5,customTarget:3,u:'s'},
+      {id:'fl6',name:'Straddle Front Lever',skillId:'front_lever',skillName:'Front Lever',skillColor:'var(--blue)',customSets:2,customTarget:5,u:'s'},
+      {id:'mu8',name:'Strict Muscle-Up',skillId:'muscle_up',skillName:'Muscle-Up',skillColor:'var(--lime)',customSets:4,customTarget:2,u:'reps'},
+      {id:'bl6',name:'Full Back Lever',skillId:'back_lever',skillName:'Back Lever',skillColor:'var(--red)',customSets:3,customTarget:3,u:'s'},
+      {id:'ls7',name:'V-Sit',skillId:'lsit',skillName:'L-Sit',skillColor:'var(--green)',customSets:3,customTarget:5,u:'s'},
+      {id:'mu6',name:'High Pull-Up',skillId:'muscle_up',skillName:'Muscle-Up',skillColor:'var(--lime)',customSets:3,customTarget:4,u:'reps'},
+    ]},
+  ],
+
+  handstand:[
+    {progId:'hs1',label:'Wrist Prep Session',exercises:[
+      {id:'hs1',name:'Wrist & Shoulder Prep',skillId:'handstand',skillName:'Handstand Hold',skillColor:'var(--lime)',customSets:3,customTarget:60,u:'s'},
+      {id:'hp1',name:'Pike Hold',skillId:'handstand',skillName:'Handstand Hold',skillColor:'var(--lime)',customSets:4,customTarget:30,u:'s'},
+      {id:'hp2',name:'Wall Walks',skillId:'handstand',skillName:'Handstand Hold',skillColor:'var(--lime)',customSets:3,customTarget:5,u:'reps'},
+      {id:'hs6',name:'Kick-Up Practice',skillId:'handstand',skillName:'Handstand Hold',skillColor:'var(--lime)',customSets:3,customTarget:8,u:'reps'},
+      {id:'ls1',name:'Support Hold',skillId:'lsit',skillName:'L-Sit',skillColor:'var(--green)',customSets:3,customTarget:20,u:'s'},
+      {id:'mu2',name:'Scapular Pull-Up',skillId:'muscle_up',skillName:'Muscle-Up',skillColor:'var(--lime)',customSets:3,customTarget:10,u:'reps'},
+    ]},
+    {progId:'hp1',label:'Pike Hold Session',exercises:[
+      {id:'hp1',name:'Pike Hold',skillId:'handstand',skillName:'Handstand Hold',skillColor:'var(--lime)',customSets:5,customTarget:30,u:'s'},
+      {id:'hp2',name:'Wall Walks',skillId:'handstand',skillName:'Handstand Hold',skillColor:'var(--lime)',customSets:4,customTarget:5,u:'reps'},
+      {id:'hp3',name:'Headstand',skillId:'handstand',skillName:'Handstand Hold',skillColor:'var(--lime)',customSets:3,customTarget:20,u:'s'},
+      {id:'hs6',name:'Kick-Up Practice',skillId:'handstand',skillName:'Handstand Hold',skillColor:'var(--lime)',customSets:4,customTarget:8,u:'reps'},
+      {id:'ls3',name:'Tuck L-Sit',skillId:'lsit',skillName:'L-Sit',skillColor:'var(--green)',customSets:3,customTarget:10,u:'s'},
+      {id:'mu4',name:'Pull-Up',skillId:'muscle_up',skillName:'Muscle-Up',skillColor:'var(--lime)',customSets:3,customTarget:8,u:'reps'},
+    ]},
+    {progId:'hp2',label:'Wall Walks Session',exercises:[
+      {id:'hp2',name:'Wall Walks',skillId:'handstand',skillName:'Handstand Hold',skillColor:'var(--lime)',customSets:5,customTarget:6,u:'reps'},
+      {id:'hp3',name:'Headstand',skillId:'handstand',skillName:'Handstand Hold',skillColor:'var(--lime)',customSets:4,customTarget:30,u:'s'},
+      {id:'hp4',name:'Wall Handstand',skillId:'handstand',skillName:'Handstand Hold',skillColor:'var(--lime)',customSets:3,customTarget:20,u:'s'},
+      {id:'hs6',name:'Kick-Up Practice',skillId:'handstand',skillName:'Handstand Hold',skillColor:'var(--lime)',customSets:4,customTarget:8,u:'reps'},
+      {id:'ls3',name:'Tuck L-Sit',skillId:'lsit',skillName:'L-Sit',skillColor:'var(--green)',customSets:3,customTarget:10,u:'s'},
+      {id:'hp1',name:'Pike Hold',skillId:'handstand',skillName:'Handstand Hold',skillColor:'var(--lime)',customSets:2,customTarget:30,u:'s'},
+    ]},
+    {progId:'hp3',label:'Headstand Session',exercises:[
+      {id:'hp3',name:'Headstand',skillId:'handstand',skillName:'Handstand Hold',skillColor:'var(--lime)',customSets:5,customTarget:30,u:'s'},
+      {id:'hp4',name:'Wall Handstand',skillId:'handstand',skillName:'Handstand Hold',skillColor:'var(--lime)',customSets:4,customTarget:25,u:'s'},
+      {id:'hp5',name:'Adv. Wall Handstand',skillId:'handstand',skillName:'Handstand Hold',skillColor:'var(--lime)',customSets:3,customTarget:15,u:'s'},
+      {id:'hs6',name:'Kick-Up Practice',skillId:'handstand',skillName:'Handstand Hold',skillColor:'var(--lime)',customSets:4,customTarget:8,u:'reps'},
+      {id:'ls5',name:'Full L-Sit',skillId:'lsit',skillName:'L-Sit',skillColor:'var(--green)',customSets:3,customTarget:6,u:'s'},
+      {id:'mu4',name:'Pull-Up',skillId:'muscle_up',skillName:'Muscle-Up',skillColor:'var(--lime)',customSets:3,customTarget:8,u:'reps'},
+    ]},
+    {progId:'hp4',label:'Wall Handstand Session',exercises:[
+      {id:'hp4',name:'Wall Handstand',skillId:'handstand',skillName:'Handstand Hold',skillColor:'var(--lime)',customSets:5,customTarget:30,u:'s'},
+      {id:'hp5',name:'Adv. Wall Handstand',skillId:'handstand',skillName:'Handstand Hold',skillColor:'var(--lime)',customSets:4,customTarget:20,u:'s'},
+      {id:'hs6',name:'Kick-Up Practice',skillId:'handstand',skillName:'Handstand Hold',skillColor:'var(--lime)',customSets:5,customTarget:8,u:'reps'},
+      {id:'hp6',name:'Handstand',skillId:'handstand',skillName:'Handstand Hold',skillColor:'var(--lime)',customSets:3,customTarget:10,u:'s'},
+      {id:'ls5',name:'Full L-Sit',skillId:'lsit',skillName:'L-Sit',skillColor:'var(--green)',customSets:3,customTarget:6,u:'s'},
+      {id:'hp1',name:'Pike Hold',skillId:'handstand',skillName:'Handstand Hold',skillColor:'var(--lime)',customSets:2,customTarget:30,u:'s'},
+    ]},
+    {progId:'hp5',label:'Adv. Wall Handstand Session',exercises:[
+      {id:'hp5',name:'Adv. Wall Handstand',skillId:'handstand',skillName:'Handstand Hold',skillColor:'var(--lime)',customSets:5,customTarget:20,u:'s'},
+      {id:'hp6',name:'Handstand',skillId:'handstand',skillName:'Handstand Hold',skillColor:'var(--lime)',customSets:4,customTarget:12,u:'s'},
+      {id:'hs6',name:'Kick-Up Practice',skillId:'handstand',skillName:'Handstand Hold',skillColor:'var(--lime)',customSets:5,customTarget:10,u:'reps'},
+      {id:'hp4',name:'Wall Handstand',skillId:'handstand',skillName:'Handstand Hold',skillColor:'var(--lime)',customSets:2,customTarget:30,u:'s'},
+      {id:'ls5',name:'Full L-Sit',skillId:'lsit',skillName:'L-Sit',skillColor:'var(--green)',customSets:3,customTarget:8,u:'s'},
+      {id:'hp7',name:'Handstand Push Up',skillId:'handstand_pu',skillName:'HSPU',skillColor:'var(--purple)',customSets:2,customTarget:2,u:'reps'},
+    ]},
+    {progId:'hp6',label:'Freestanding Handstand Session',exercises:[
+      {id:'hp6',name:'Handstand',skillId:'handstand',skillName:'Handstand Hold',skillColor:'var(--lime)',customSets:6,customTarget:15,u:'s'},
+      {id:'hs6',name:'Kick-Up Practice',skillId:'handstand',skillName:'Handstand Hold',skillColor:'var(--lime)',customSets:5,customTarget:10,u:'reps'},
+      {id:'hp5',name:'Adv. Wall Handstand',skillId:'handstand',skillName:'Handstand Hold',skillColor:'var(--lime)',customSets:3,customTarget:20,u:'s'},
+      {id:'hp7',name:'Handstand Push Up',skillId:'handstand_pu',skillName:'HSPU',skillColor:'var(--purple)',customSets:3,customTarget:3,u:'reps'},
+      {id:'ls5',name:'Full L-Sit',skillId:'lsit',skillName:'L-Sit',skillColor:'var(--green)',customSets:3,customTarget:8,u:'s'},
+      {id:'hp1',name:'Pike Hold',skillId:'handstand',skillName:'Handstand Hold',skillColor:'var(--lime)',customSets:2,customTarget:30,u:'s'},
+    ]},
+  ],
+
+  handstand_pu:[
+    {progId:'hp7',label:'Handstand Push-Up Session',exercises:[
+      {id:'hp7',name:'Handstand Push Up',skillId:'handstand_pu',skillName:'Handstand Push-Up',skillColor:'var(--purple)',customSets:5,customTarget:3,u:'reps'},
+      {id:'hp6',name:'Handstand',skillId:'handstand',skillName:'Handstand Hold',skillColor:'var(--lime)',customSets:4,customTarget:15,u:'s'},
+      {id:'hp5',name:'Adv. Wall Handstand',skillId:'handstand',skillName:'Handstand Hold',skillColor:'var(--lime)',customSets:3,customTarget:20,u:'s'},
+      {id:'hs6',name:'Kick-Up Practice',skillId:'handstand',skillName:'Handstand Hold',skillColor:'var(--lime)',customSets:3,customTarget:8,u:'reps'},
+      {id:'ls5',name:'Full L-Sit',skillId:'lsit',skillName:'L-Sit',skillColor:'var(--green)',customSets:3,customTarget:8,u:'s'},
+      {id:'mu5',name:'Chest-to-Bar Pull-Up',skillId:'muscle_up',skillName:'Muscle-Up',skillColor:'var(--lime)',customSets:3,customTarget:5,u:'reps'},
+    ]},
+  ],
+
+  muscle_up:[
+    {progId:'mu1',label:'Dead Hang Session',exercises:[
+      {id:'mu1',name:'Dead Hang',skillId:'muscle_up',skillName:'Muscle-Up',skillColor:'var(--lime)',customSets:5,customTarget:30,u:'s'},
+      {id:'mu2',name:'Scapular Pull-Up',skillId:'muscle_up',skillName:'Muscle-Up',skillColor:'var(--lime)',customSets:4,customTarget:10,u:'reps'},
+      {id:'mu3',name:'Negative Pull-Up',skillId:'muscle_up',skillName:'Muscle-Up',skillColor:'var(--lime)',customSets:3,customTarget:4,u:'reps'},
+      {id:'bl1',name:'Skin the Cat',skillId:'back_lever',skillName:'Back Lever',skillColor:'var(--red)',customSets:3,customTarget:5,u:'reps'},
+      {id:'ls1',name:'Support Hold',skillId:'lsit',skillName:'L-Sit',skillColor:'var(--green)',customSets:3,customTarget:20,u:'s'},
+      {id:'ls2',name:'Foot-Tap L-Sit',skillId:'lsit',skillName:'L-Sit',skillColor:'var(--green)',customSets:3,customTarget:10,u:'reps'},
+    ]},
+    {progId:'mu2',label:'Scapular Pull-Up Session',exercises:[
+      {id:'mu2',name:'Scapular Pull-Up',skillId:'muscle_up',skillName:'Muscle-Up',skillColor:'var(--lime)',customSets:5,customTarget:10,u:'reps'},
+      {id:'mu3',name:'Negative Pull-Up',skillId:'muscle_up',skillName:'Muscle-Up',skillColor:'var(--lime)',customSets:4,customTarget:5,u:'reps'},
+      {id:'mu4',name:'Pull-Up',skillId:'muscle_up',skillName:'Muscle-Up',skillColor:'var(--lime)',customSets:3,customTarget:5,u:'reps'},
+      {id:'mu1',name:'Dead Hang',skillId:'muscle_up',skillName:'Muscle-Up',skillColor:'var(--lime)',customSets:3,customTarget:40,u:'s'},
+      {id:'bl1',name:'Skin the Cat',skillId:'back_lever',skillName:'Back Lever',skillColor:'var(--red)',customSets:3,customTarget:5,u:'reps'},
+      {id:'ls2',name:'Foot-Tap L-Sit',skillId:'lsit',skillName:'L-Sit',skillColor:'var(--green)',customSets:3,customTarget:10,u:'reps'},
+    ]},
+    {progId:'mu3',label:'Negative Pull-Up Session',exercises:[
+      {id:'mu3',name:'Negative Pull-Up',skillId:'muscle_up',skillName:'Muscle-Up',skillColor:'var(--lime)',customSets:5,customTarget:5,u:'reps'},
+      {id:'mu4',name:'Pull-Up',skillId:'muscle_up',skillName:'Muscle-Up',skillColor:'var(--lime)',customSets:4,customTarget:6,u:'reps'},
+      {id:'mu2',name:'Scapular Pull-Up',skillId:'muscle_up',skillName:'Muscle-Up',skillColor:'var(--lime)',customSets:3,customTarget:10,u:'reps'},
+      {id:'bl2',name:'German Hang',skillId:'back_lever',skillName:'Back Lever',skillColor:'var(--red)',customSets:3,customTarget:15,u:'s'},
+      {id:'ls3',name:'Tuck L-Sit',skillId:'lsit',skillName:'L-Sit',skillColor:'var(--green)',customSets:3,customTarget:10,u:'s'},
+      {id:'fl1',name:'Tuck Front Lever',skillId:'front_lever',skillName:'Front Lever',skillColor:'var(--blue)',customSets:3,customTarget:10,u:'s'},
+    ]},
+    {progId:'mu4',label:'Pull-Up Session',exercises:[
+      {id:'mu4',name:'Pull-Up',skillId:'muscle_up',skillName:'Muscle-Up',skillColor:'var(--lime)',customSets:5,customTarget:8,u:'reps'},
+      {id:'mu5',name:'Chest-to-Bar Pull-Up',skillId:'muscle_up',skillName:'Muscle-Up',skillColor:'var(--lime)',customSets:4,customTarget:4,u:'reps'},
+      {id:'mu3',name:'Negative Pull-Up',skillId:'muscle_up',skillName:'Muscle-Up',skillColor:'var(--lime)',customSets:3,customTarget:5,u:'reps'},
+      {id:'bl2',name:'German Hang',skillId:'back_lever',skillName:'Back Lever',skillColor:'var(--red)',customSets:3,customTarget:20,u:'s'},
+      {id:'fl1',name:'Tuck Front Lever',skillId:'front_lever',skillName:'Front Lever',skillColor:'var(--blue)',customSets:3,customTarget:12,u:'s'},
+      {id:'ls3',name:'Tuck L-Sit',skillId:'lsit',skillName:'L-Sit',skillColor:'var(--green)',customSets:3,customTarget:10,u:'s'},
+    ]},
+    {progId:'mu5',label:'Chest-to-Bar Session',exercises:[
+      {id:'mu5',name:'Chest-to-Bar Pull-Up',skillId:'muscle_up',skillName:'Muscle-Up',skillColor:'var(--lime)',customSets:5,customTarget:5,u:'reps'},
+      {id:'mu6',name:'High Pull-Up',skillId:'muscle_up',skillName:'Muscle-Up',skillColor:'var(--lime)',customSets:4,customTarget:3,u:'reps'},
+      {id:'mu4',name:'Pull-Up',skillId:'muscle_up',skillName:'Muscle-Up',skillColor:'var(--lime)',customSets:3,customTarget:8,u:'reps'},
+      {id:'fl2',name:'Adv. Tuck Front Lever',skillId:'front_lever',skillName:'Front Lever',skillColor:'var(--blue)',customSets:3,customTarget:10,u:'s'},
+      {id:'bl3',name:'Tuck Back Lever',skillId:'back_lever',skillName:'Back Lever',skillColor:'var(--red)',customSets:3,customTarget:8,u:'s'},
+      {id:'ls4',name:'One-Leg L-Sit',skillId:'lsit',skillName:'L-Sit',skillColor:'var(--green)',customSets:3,customTarget:8,u:'s'},
+    ]},
+    {progId:'mu6',label:'High Pull-Up Session',exercises:[
+      {id:'mu6',name:'High Pull-Up',skillId:'muscle_up',skillName:'Muscle-Up',skillColor:'var(--lime)',customSets:5,customTarget:4,u:'reps'},
+      {id:'mu7',name:'Negative Muscle-Up',skillId:'muscle_up',skillName:'Muscle-Up',skillColor:'var(--lime)',customSets:4,customTarget:3,u:'reps'},
+      {id:'mu5',name:'Chest-to-Bar Pull-Up',skillId:'muscle_up',skillName:'Muscle-Up',skillColor:'var(--lime)',customSets:3,customTarget:5,u:'reps'},
+      {id:'fl3',name:'Super Adv. Tuck',skillId:'front_lever',skillName:'Front Lever',skillColor:'var(--blue)',customSets:3,customTarget:8,u:'s'},
+      {id:'bl3',name:'Tuck Back Lever',skillId:'back_lever',skillName:'Back Lever',skillColor:'var(--red)',customSets:3,customTarget:8,u:'s'},
+      {id:'ls5',name:'Full L-Sit',skillId:'lsit',skillName:'L-Sit',skillColor:'var(--green)',customSets:3,customTarget:6,u:'s'},
+    ]},
+    {progId:'mu7',label:'Negative Muscle-Up Session',exercises:[
+      {id:'mu7',name:'Negative Muscle-Up',skillId:'muscle_up',skillName:'Muscle-Up',skillColor:'var(--lime)',customSets:5,customTarget:3,u:'reps'},
+      {id:'mu8',name:'Strict Muscle-Up',skillId:'muscle_up',skillName:'Muscle-Up',skillColor:'var(--lime)',customSets:3,customTarget:1,u:'reps'},
+      {id:'mu5',name:'Chest-to-Bar Pull-Up',skillId:'muscle_up',skillName:'Muscle-Up',skillColor:'var(--lime)',customSets:3,customTarget:5,u:'reps'},
+      {id:'fl3',name:'Super Adv. Tuck',skillId:'front_lever',skillName:'Front Lever',skillColor:'var(--blue)',customSets:3,customTarget:8,u:'s'},
+      {id:'bl4',name:'Half Layout',skillId:'back_lever',skillName:'Back Lever',skillColor:'var(--red)',customSets:3,customTarget:6,u:'s'},
+      {id:'ls5',name:'Full L-Sit',skillId:'lsit',skillName:'L-Sit',skillColor:'var(--green)',customSets:3,customTarget:6,u:'s'},
+    ]},
+    {progId:'mu8',label:'Strict Muscle-Up Session',exercises:[
+      {id:'mu8',name:'Strict Muscle-Up',skillId:'muscle_up',skillName:'Muscle-Up',skillColor:'var(--lime)',customSets:5,customTarget:2,u:'reps'},
+      {id:'mu7',name:'Negative Muscle-Up',skillId:'muscle_up',skillName:'Muscle-Up',skillColor:'var(--lime)',customSets:3,customTarget:3,u:'reps'},
+      {id:'mu6',name:'High Pull-Up',skillId:'muscle_up',skillName:'Muscle-Up',skillColor:'var(--lime)',customSets:3,customTarget:4,u:'reps'},
+      {id:'fl4',name:'Straddle Half Lay',skillId:'front_lever',skillName:'Front Lever',skillColor:'var(--blue)',customSets:3,customTarget:6,u:'s'},
+      {id:'bl5',name:'Straddle Back Lever',skillId:'back_lever',skillName:'Back Lever',skillColor:'var(--red)',customSets:3,customTarget:5,u:'s'},
+      {id:'ls6',name:'Straddle L-Sit',skillId:'lsit',skillName:'L-Sit',skillColor:'var(--green)',customSets:3,customTarget:8,u:'s'},
+    ]},
+  ],
+
+  back_lever:[
+    {progId:'bl1',label:'Skin the Cat Session',exercises:[
+      {id:'bl1',name:'Skin the Cat',skillId:'back_lever',skillName:'Back Lever',skillColor:'var(--red)',customSets:5,customTarget:5,u:'reps'},
+      {id:'bl2',name:'German Hang',skillId:'back_lever',skillName:'Back Lever',skillColor:'var(--red)',customSets:4,customTarget:20,u:'s'},
+      {id:'mu4',name:'Pull-Up',skillId:'muscle_up',skillName:'Muscle-Up',skillColor:'var(--lime)',customSets:4,customTarget:8,u:'reps'},
+      {id:'mu2',name:'Scapular Pull-Up',skillId:'muscle_up',skillName:'Muscle-Up',skillColor:'var(--lime)',customSets:3,customTarget:10,u:'reps'},
+      {id:'ls3',name:'Tuck L-Sit',skillId:'lsit',skillName:'L-Sit',skillColor:'var(--green)',customSets:3,customTarget:10,u:'s'},
+      {id:'mu1',name:'Dead Hang',skillId:'muscle_up',skillName:'Muscle-Up',skillColor:'var(--lime)',customSets:3,customTarget:30,u:'s'},
+    ]},
+    {progId:'bl2',label:'German Hang Session',exercises:[
+      {id:'bl2',name:'German Hang',skillId:'back_lever',skillName:'Back Lever',skillColor:'var(--red)',customSets:5,customTarget:20,u:'s'},
+      {id:'bl3',name:'Tuck Back Lever',skillId:'back_lever',skillName:'Back Lever',skillColor:'var(--red)',customSets:4,customTarget:8,u:'s'},
+      {id:'bl1',name:'Skin the Cat',skillId:'back_lever',skillName:'Back Lever',skillColor:'var(--red)',customSets:3,customTarget:5,u:'reps'},
+      {id:'mu4',name:'Pull-Up',skillId:'muscle_up',skillName:'Muscle-Up',skillColor:'var(--lime)',customSets:3,customTarget:8,u:'reps'},
+      {id:'fl1',name:'Tuck Front Lever',skillId:'front_lever',skillName:'Front Lever',skillColor:'var(--blue)',customSets:3,customTarget:12,u:'s'},
+      {id:'ls3',name:'Tuck L-Sit',skillId:'lsit',skillName:'L-Sit',skillColor:'var(--green)',customSets:3,customTarget:10,u:'s'},
+    ]},
+    {progId:'bl3',label:'Tuck Back Lever Session',exercises:[
+      {id:'bl3',name:'Tuck Back Lever',skillId:'back_lever',skillName:'Back Lever',skillColor:'var(--red)',customSets:5,customTarget:8,u:'s'},
+      {id:'bl4',name:'Half Layout',skillId:'back_lever',skillName:'Back Lever',skillColor:'var(--red)',customSets:3,customTarget:5,u:'s'},
+      {id:'bl2',name:'German Hang',skillId:'back_lever',skillName:'Back Lever',skillColor:'var(--red)',customSets:3,customTarget:20,u:'s'},
+      {id:'mu5',name:'Chest-to-Bar Pull-Up',skillId:'muscle_up',skillName:'Muscle-Up',skillColor:'var(--lime)',customSets:3,customTarget:5,u:'reps'},
+      {id:'fl2',name:'Adv. Tuck Front Lever',skillId:'front_lever',skillName:'Front Lever',skillColor:'var(--blue)',customSets:3,customTarget:10,u:'s'},
+      {id:'ls4',name:'One-Leg L-Sit',skillId:'lsit',skillName:'L-Sit',skillColor:'var(--green)',customSets:3,customTarget:8,u:'s'},
+    ]},
+    {progId:'bl4',label:'Half Layout Session',exercises:[
+      {id:'bl4',name:'Half Layout',skillId:'back_lever',skillName:'Back Lever',skillColor:'var(--red)',customSets:5,customTarget:6,u:'s'},
+      {id:'bl5',name:'Straddle Back Lever',skillId:'back_lever',skillName:'Back Lever',skillColor:'var(--red)',customSets:3,customTarget:4,u:'s'},
+      {id:'bl3',name:'Tuck Back Lever',skillId:'back_lever',skillName:'Back Lever',skillColor:'var(--red)',customSets:3,customTarget:8,u:'s'},
+      {id:'mu5',name:'Chest-to-Bar Pull-Up',skillId:'muscle_up',skillName:'Muscle-Up',skillColor:'var(--lime)',customSets:3,customTarget:5,u:'reps'},
+      {id:'fl3',name:'Super Adv. Tuck',skillId:'front_lever',skillName:'Front Lever',skillColor:'var(--blue)',customSets:3,customTarget:8,u:'s'},
+      {id:'ls5',name:'Full L-Sit',skillId:'lsit',skillName:'L-Sit',skillColor:'var(--green)',customSets:3,customTarget:6,u:'s'},
+    ]},
+    {progId:'bl5',label:'Straddle Back Lever Session',exercises:[
+      {id:'bl5',name:'Straddle Back Lever',skillId:'back_lever',skillName:'Back Lever',skillColor:'var(--red)',customSets:5,customTarget:5,u:'s'},
+      {id:'bl6',name:'Full Back Lever',skillId:'back_lever',skillName:'Back Lever',skillColor:'var(--red)',customSets:3,customTarget:2,u:'s'},
+      {id:'bl4',name:'Half Layout',skillId:'back_lever',skillName:'Back Lever',skillColor:'var(--red)',customSets:3,customTarget:6,u:'s'},
+      {id:'fl3',name:'Super Adv. Tuck',skillId:'front_lever',skillName:'Front Lever',skillColor:'var(--blue)',customSets:3,customTarget:8,u:'s'},
+      {id:'mu6',name:'High Pull-Up',skillId:'muscle_up',skillName:'Muscle-Up',skillColor:'var(--lime)',customSets:3,customTarget:4,u:'reps'},
+      {id:'ls5',name:'Full L-Sit',skillId:'lsit',skillName:'L-Sit',skillColor:'var(--green)',customSets:3,customTarget:6,u:'s'},
+    ]},
+    {progId:'bl6',label:'Full Back Lever Session',exercises:[
+      {id:'bl6',name:'Full Back Lever',skillId:'back_lever',skillName:'Back Lever',skillColor:'var(--red)',customSets:5,customTarget:3,u:'s'},
+      {id:'bl5',name:'Straddle Back Lever',skillId:'back_lever',skillName:'Back Lever',skillColor:'var(--red)',customSets:3,customTarget:5,u:'s'},
+      {id:'fl4',name:'Straddle Half Lay',skillId:'front_lever',skillName:'Front Lever',skillColor:'var(--blue)',customSets:3,customTarget:8,u:'s'},
+      {id:'fl5',name:'Front Lever Half Lay',skillId:'front_lever',skillName:'Front Lever',skillColor:'var(--blue)',customSets:3,customTarget:5,u:'s'},
+      {id:'mu7',name:'Negative Muscle-Up',skillId:'muscle_up',skillName:'Muscle-Up',skillColor:'var(--lime)',customSets:3,customTarget:3,u:'reps'},
+      {id:'ls6',name:'Straddle L-Sit',skillId:'lsit',skillName:'L-Sit',skillColor:'var(--green)',customSets:3,customTarget:8,u:'s'},
+    ]},
+  ],
+
+  lsit:[
+    {progId:'ls1',label:'Support Hold Session',exercises:[
+      {id:'ls1',name:'Support Hold',skillId:'lsit',skillName:'L-Sit',skillColor:'var(--green)',customSets:5,customTarget:30,u:'s'},
+      {id:'ls2',name:'Foot-Tap L-Sit',skillId:'lsit',skillName:'L-Sit',skillColor:'var(--green)',customSets:4,customTarget:10,u:'reps'},
+      {id:'ls3',name:'Tuck L-Sit',skillId:'lsit',skillName:'L-Sit',skillColor:'var(--green)',customSets:3,customTarget:5,u:'s'},
+      {id:'mu4',name:'Pull-Up',skillId:'muscle_up',skillName:'Muscle-Up',skillColor:'var(--lime)',customSets:3,customTarget:8,u:'reps'},
+      {id:'ps1',name:'Deep Squat Hold',skillId:'pistol',skillName:'Pistol Squat',skillColor:'var(--pink)',customSets:3,customTarget:30,u:'s'},
+      {id:'mu2',name:'Scapular Pull-Up',skillId:'muscle_up',skillName:'Muscle-Up',skillColor:'var(--lime)',customSets:3,customTarget:10,u:'reps'},
+    ]},
+    {progId:'ls2',label:'Foot-Tap Session',exercises:[
+      {id:'ls2',name:'Foot-Tap L-Sit',skillId:'lsit',skillName:'L-Sit',skillColor:'var(--green)',customSets:5,customTarget:10,u:'reps'},
+      {id:'ls3',name:'Tuck L-Sit',skillId:'lsit',skillName:'L-Sit',skillColor:'var(--green)',customSets:4,customTarget:8,u:'s'},
+      {id:'ls4',name:'One-Leg L-Sit',skillId:'lsit',skillName:'L-Sit',skillColor:'var(--green)',customSets:3,customTarget:5,u:'s'},
+      {id:'mu4',name:'Pull-Up',skillId:'muscle_up',skillName:'Muscle-Up',skillColor:'var(--lime)',customSets:3,customTarget:8,u:'reps'},
+      {id:'ps2',name:'Ankle Mobility Drill',skillId:'pistol',skillName:'Pistol Squat',skillColor:'var(--pink)',customSets:3,customTarget:10,u:'reps'},
+      {id:'hp1',name:'Pike Hold',skillId:'handstand',skillName:'Handstand Hold',skillColor:'var(--lime)',customSets:3,customTarget:20,u:'s'},
+    ]},
+    {progId:'ls3',label:'Tuck L-Sit Session',exercises:[
+      {id:'ls3',name:'Tuck L-Sit',skillId:'lsit',skillName:'L-Sit',skillColor:'var(--green)',customSets:5,customTarget:10,u:'s'},
+      {id:'ls4',name:'One-Leg L-Sit',skillId:'lsit',skillName:'L-Sit',skillColor:'var(--green)',customSets:4,customTarget:6,u:'s'},
+      {id:'ls5',name:'Full L-Sit',skillId:'lsit',skillName:'L-Sit',skillColor:'var(--green)',customSets:3,customTarget:3,u:'s'},
+      {id:'mu4',name:'Pull-Up',skillId:'muscle_up',skillName:'Muscle-Up',skillColor:'var(--lime)',customSets:3,customTarget:8,u:'reps'},
+      {id:'fl1',name:'Tuck Front Lever',skillId:'front_lever',skillName:'Front Lever',skillColor:'var(--blue)',customSets:3,customTarget:12,u:'s'},
+      {id:'ps3',name:'Cossack Squat',skillId:'pistol',skillName:'Pistol Squat',skillColor:'var(--pink)',customSets:3,customTarget:8,u:'reps'},
+    ]},
+    {progId:'ls4',label:'One-Leg L-Sit Session',exercises:[
+      {id:'ls4',name:'One-Leg L-Sit',skillId:'lsit',skillName:'L-Sit',skillColor:'var(--green)',customSets:5,customTarget:8,u:'s'},
+      {id:'ls5',name:'Full L-Sit',skillId:'lsit',skillName:'L-Sit',skillColor:'var(--green)',customSets:4,customTarget:5,u:'s'},
+      {id:'ls6',name:'Straddle L-Sit',skillId:'lsit',skillName:'L-Sit',skillColor:'var(--green)',customSets:3,customTarget:6,u:'s'},
+      {id:'mu5',name:'Chest-to-Bar Pull-Up',skillId:'muscle_up',skillName:'Muscle-Up',skillColor:'var(--lime)',customSets:3,customTarget:5,u:'reps'},
+      {id:'fl2',name:'Adv. Tuck Front Lever',skillId:'front_lever',skillName:'Front Lever',skillColor:'var(--blue)',customSets:3,customTarget:10,u:'s'},
+      {id:'ps4',name:'Assisted Pistol',skillId:'pistol',skillName:'Pistol Squat',skillColor:'var(--pink)',customSets:3,customTarget:6,u:'reps'},
+    ]},
+    {progId:'ls5',label:'Full L-Sit Session',exercises:[
+      {id:'ls5',name:'Full L-Sit',skillId:'lsit',skillName:'L-Sit',skillColor:'var(--green)',customSets:5,customTarget:6,u:'s'},
+      {id:'ls6',name:'Straddle L-Sit',skillId:'lsit',skillName:'L-Sit',skillColor:'var(--green)',customSets:4,customTarget:8,u:'s'},
+      {id:'ls7',name:'V-Sit',skillId:'lsit',skillName:'L-Sit',skillColor:'var(--green)',customSets:3,customTarget:3,u:'s'},
+      {id:'mu5',name:'Chest-to-Bar Pull-Up',skillId:'muscle_up',skillName:'Muscle-Up',skillColor:'var(--lime)',customSets:3,customTarget:5,u:'reps'},
+      {id:'fl3',name:'Super Adv. Tuck',skillId:'front_lever',skillName:'Front Lever',skillColor:'var(--blue)',customSets:3,customTarget:8,u:'s'},
+      {id:'ps5',name:'Box Pistol Squat',skillId:'pistol',skillName:'Pistol Squat',skillColor:'var(--pink)',customSets:3,customTarget:5,u:'reps'},
+    ]},
+    {progId:'ls6',label:'Straddle L-Sit Session',exercises:[
+      {id:'ls6',name:'Straddle L-Sit',skillId:'lsit',skillName:'L-Sit',skillColor:'var(--green)',customSets:5,customTarget:8,u:'s'},
+      {id:'ls7',name:'V-Sit',skillId:'lsit',skillName:'L-Sit',skillColor:'var(--green)',customSets:4,customTarget:4,u:'s'},
+      {id:'ls5',name:'Full L-Sit',skillId:'lsit',skillName:'L-Sit',skillColor:'var(--green)',customSets:2,customTarget:6,u:'s'},
+      {id:'fl4',name:'Straddle Half Lay',skillId:'front_lever',skillName:'Front Lever',skillColor:'var(--blue)',customSets:3,customTarget:8,u:'s'},
+      {id:'mu6',name:'High Pull-Up',skillId:'muscle_up',skillName:'Muscle-Up',skillColor:'var(--lime)',customSets:3,customTarget:4,u:'reps'},
+      {id:'ps6',name:'Negative Pistol',skillId:'pistol',skillName:'Pistol Squat',skillColor:'var(--pink)',customSets:3,customTarget:5,u:'reps'},
+    ]},
+    {progId:'ls7',label:'V-Sit Session',exercises:[
+      {id:'ls7',name:'V-Sit',skillId:'lsit',skillName:'L-Sit',skillColor:'var(--green)',customSets:5,customTarget:5,u:'s'},
+      {id:'ls8',name:'Manna',skillId:'lsit',skillName:'L-Sit',skillColor:'var(--green)',customSets:3,customTarget:2,u:'s'},
+      {id:'ls6',name:'Straddle L-Sit',skillId:'lsit',skillName:'L-Sit',skillColor:'var(--green)',customSets:2,customTarget:8,u:'s'},
+      {id:'fl5',name:'Front Lever Half Lay',skillId:'front_lever',skillName:'Front Lever',skillColor:'var(--blue)',customSets:3,customTarget:6,u:'s'},
+      {id:'mu7',name:'Negative Muscle-Up',skillId:'muscle_up',skillName:'Muscle-Up',skillColor:'var(--lime)',customSets:3,customTarget:3,u:'reps'},
+      {id:'ps7',name:'Pistol Squat',skillId:'pistol',skillName:'Pistol Squat',skillColor:'var(--pink)',customSets:3,customTarget:5,u:'reps'},
+    ]},
+    {progId:'ls8',label:'Manna Session',exercises:[
+      {id:'ls8',name:'Manna',skillId:'lsit',skillName:'L-Sit',skillColor:'var(--green)',customSets:5,customTarget:2,u:'s'},
+      {id:'ls7',name:'V-Sit',skillId:'lsit',skillName:'L-Sit',skillColor:'var(--green)',customSets:3,customTarget:5,u:'s'},
+      {id:'fl7',name:'Front Lever',skillId:'front_lever',skillName:'Front Lever',skillColor:'var(--blue)',customSets:3,customTarget:3,u:'s'},
+      {id:'mu8',name:'Strict Muscle-Up',skillId:'muscle_up',skillName:'Muscle-Up',skillColor:'var(--lime)',customSets:3,customTarget:2,u:'reps'},
+      {id:'ps7',name:'Pistol Squat',skillId:'pistol',skillName:'Pistol Squat',skillColor:'var(--pink)',customSets:3,customTarget:5,u:'reps'},
+      {id:'bl6',name:'Full Back Lever',skillId:'back_lever',skillName:'Back Lever',skillColor:'var(--red)',customSets:3,customTarget:3,u:'s'},
+    ]},
+  ],
+
+  pistol:[
+    {progId:'ps1',label:'Deep Squat Session',exercises:[
+      {id:'ps1',name:'Deep Squat Hold',skillId:'pistol',skillName:'Pistol Squat',skillColor:'var(--pink)',customSets:4,customTarget:45,u:'s'},
+      {id:'ps2',name:'Ankle Mobility Drill',skillId:'pistol',skillName:'Pistol Squat',skillColor:'var(--pink)',customSets:4,customTarget:12,u:'reps'},
+      {id:'ps3',name:'Cossack Squat',skillId:'pistol',skillName:'Pistol Squat',skillColor:'var(--pink)',customSets:3,customTarget:8,u:'reps'},
+      {id:'ps4',name:'Assisted Pistol',skillId:'pistol',skillName:'Pistol Squat',skillColor:'var(--pink)',customSets:3,customTarget:5,u:'reps'},
+      {id:'ls1',name:'Support Hold',skillId:'lsit',skillName:'L-Sit',skillColor:'var(--green)',customSets:3,customTarget:20,u:'s'},
+      {id:'mu4',name:'Pull-Up',skillId:'muscle_up',skillName:'Muscle-Up',skillColor:'var(--lime)',customSets:3,customTarget:8,u:'reps'},
+    ]},
+    {progId:'ps2',label:'Ankle Mobility Session',exercises:[
+      {id:'ps2',name:'Ankle Mobility Drill',skillId:'pistol',skillName:'Pistol Squat',skillColor:'var(--pink)',customSets:5,customTarget:12,u:'reps'},
+      {id:'ps3',name:'Cossack Squat',skillId:'pistol',skillName:'Pistol Squat',skillColor:'var(--pink)',customSets:4,customTarget:8,u:'reps'},
+      {id:'ps4',name:'Assisted Pistol',skillId:'pistol',skillName:'Pistol Squat',skillColor:'var(--pink)',customSets:4,customTarget:6,u:'reps'},
+      {id:'ps1',name:'Deep Squat Hold',skillId:'pistol',skillName:'Pistol Squat',skillColor:'var(--pink)',customSets:3,customTarget:30,u:'s'},
+      {id:'ls3',name:'Tuck L-Sit',skillId:'lsit',skillName:'L-Sit',skillColor:'var(--green)',customSets:3,customTarget:10,u:'s'},
+      {id:'mu4',name:'Pull-Up',skillId:'muscle_up',skillName:'Muscle-Up',skillColor:'var(--lime)',customSets:3,customTarget:8,u:'reps'},
+    ]},
+    {progId:'ps3',label:'Cossack Squat Session',exercises:[
+      {id:'ps3',name:'Cossack Squat',skillId:'pistol',skillName:'Pistol Squat',skillColor:'var(--pink)',customSets:5,customTarget:10,u:'reps'},
+      {id:'ps4',name:'Assisted Pistol',skillId:'pistol',skillName:'Pistol Squat',skillColor:'var(--pink)',customSets:4,customTarget:6,u:'reps'},
+      {id:'ps5',name:'Box Pistol Squat',skillId:'pistol',skillName:'Pistol Squat',skillColor:'var(--pink)',customSets:3,customTarget:4,u:'reps'},
+      {id:'ps2',name:'Ankle Mobility Drill',skillId:'pistol',skillName:'Pistol Squat',skillColor:'var(--pink)',customSets:3,customTarget:12,u:'reps'},
+      {id:'ls3',name:'Tuck L-Sit',skillId:'lsit',skillName:'L-Sit',skillColor:'var(--green)',customSets:3,customTarget:10,u:'s'},
+      {id:'mu4',name:'Pull-Up',skillId:'muscle_up',skillName:'Muscle-Up',skillColor:'var(--lime)',customSets:3,customTarget:8,u:'reps'},
+    ]},
+    {progId:'ps4',label:'Assisted Pistol Session',exercises:[
+      {id:'ps4',name:'Assisted Pistol',skillId:'pistol',skillName:'Pistol Squat',skillColor:'var(--pink)',customSets:5,customTarget:6,u:'reps'},
+      {id:'ps5',name:'Box Pistol Squat',skillId:'pistol',skillName:'Pistol Squat',skillColor:'var(--pink)',customSets:4,customTarget:5,u:'reps'},
+      {id:'ps6',name:'Negative Pistol',skillId:'pistol',skillName:'Pistol Squat',skillColor:'var(--pink)',customSets:3,customTarget:4,u:'reps'},
+      {id:'ps3',name:'Cossack Squat',skillId:'pistol',skillName:'Pistol Squat',skillColor:'var(--pink)',customSets:3,customTarget:8,u:'reps'},
+      {id:'ls4',name:'One-Leg L-Sit',skillId:'lsit',skillName:'L-Sit',skillColor:'var(--green)',customSets:3,customTarget:6,u:'s'},
+      {id:'mu4',name:'Pull-Up',skillId:'muscle_up',skillName:'Muscle-Up',skillColor:'var(--lime)',customSets:3,customTarget:8,u:'reps'},
+    ]},
+    {progId:'ps5',label:'Box Pistol Session',exercises:[
+      {id:'ps5',name:'Box Pistol Squat',skillId:'pistol',skillName:'Pistol Squat',skillColor:'var(--pink)',customSets:5,customTarget:5,u:'reps'},
+      {id:'ps6',name:'Negative Pistol',skillId:'pistol',skillName:'Pistol Squat',skillColor:'var(--pink)',customSets:4,customTarget:4,u:'reps'},
+      {id:'ps7',name:'Pistol Squat',skillId:'pistol',skillName:'Pistol Squat',skillColor:'var(--pink)',customSets:3,customTarget:2,u:'reps'},
+      {id:'ps3',name:'Cossack Squat',skillId:'pistol',skillName:'Pistol Squat',skillColor:'var(--pink)',customSets:3,customTarget:8,u:'reps'},
+      {id:'ls5',name:'Full L-Sit',skillId:'lsit',skillName:'L-Sit',skillColor:'var(--green)',customSets:3,customTarget:6,u:'s'},
+      {id:'mu5',name:'Chest-to-Bar Pull-Up',skillId:'muscle_up',skillName:'Muscle-Up',skillColor:'var(--lime)',customSets:3,customTarget:5,u:'reps'},
+    ]},
+    {progId:'ps6',label:'Negative Pistol Session',exercises:[
+      {id:'ps6',name:'Negative Pistol',skillId:'pistol',skillName:'Pistol Squat',skillColor:'var(--pink)',customSets:5,customTarget:5,u:'reps'},
+      {id:'ps7',name:'Pistol Squat',skillId:'pistol',skillName:'Pistol Squat',skillColor:'var(--pink)',customSets:4,customTarget:3,u:'reps'},
+      {id:'ps5',name:'Box Pistol Squat',skillId:'pistol',skillName:'Pistol Squat',skillColor:'var(--pink)',customSets:3,customTarget:5,u:'reps'},
+      {id:'ps3',name:'Cossack Squat',skillId:'pistol',skillName:'Pistol Squat',skillColor:'var(--pink)',customSets:3,customTarget:8,u:'reps'},
+      {id:'ls5',name:'Full L-Sit',skillId:'lsit',skillName:'L-Sit',skillColor:'var(--green)',customSets:3,customTarget:6,u:'s'},
+      {id:'mu5',name:'Chest-to-Bar Pull-Up',skillId:'muscle_up',skillName:'Muscle-Up',skillColor:'var(--lime)',customSets:3,customTarget:5,u:'reps'},
+    ]},
+    {progId:'ps7',label:'Pistol Squat Session',exercises:[
+      {id:'ps7',name:'Pistol Squat',skillId:'pistol',skillName:'Pistol Squat',skillColor:'var(--pink)',customSets:5,customTarget:5,u:'reps'},
+      {id:'ps8',name:'Weighted Pistol',skillId:'pistol',skillName:'Pistol Squat',skillColor:'var(--pink)',customSets:4,customTarget:4,u:'reps'},
+      {id:'ps6',name:'Negative Pistol',skillId:'pistol',skillName:'Pistol Squat',skillColor:'var(--pink)',customSets:2,customTarget:5,u:'reps'},
+      {id:'ps3',name:'Cossack Squat',skillId:'pistol',skillName:'Pistol Squat',skillColor:'var(--pink)',customSets:3,customTarget:8,u:'reps'},
+      {id:'ls5',name:'Full L-Sit',skillId:'lsit',skillName:'L-Sit',skillColor:'var(--green)',customSets:3,customTarget:6,u:'s'},
+      {id:'mu5',name:'Chest-to-Bar Pull-Up',skillId:'muscle_up',skillName:'Muscle-Up',skillColor:'var(--lime)',customSets:3,customTarget:5,u:'reps'},
+    ]},
+    {progId:'ps8',label:'Weighted Pistol Session',exercises:[
+      {id:'ps8',name:'Weighted Pistol',skillId:'pistol',skillName:'Pistol Squat',skillColor:'var(--pink)',customSets:5,customTarget:5,u:'reps'},
+      {id:'ps7',name:'Pistol Squat',skillId:'pistol',skillName:'Pistol Squat',skillColor:'var(--pink)',customSets:3,customTarget:5,u:'reps'},
+      {id:'ps6',name:'Negative Pistol',skillId:'pistol',skillName:'Pistol Squat',skillColor:'var(--pink)',customSets:2,customTarget:5,u:'reps'},
+      {id:'ls6',name:'Straddle L-Sit',skillId:'lsit',skillName:'L-Sit',skillColor:'var(--green)',customSets:3,customTarget:8,u:'s'},
+      {id:'mu6',name:'High Pull-Up',skillId:'muscle_up',skillName:'Muscle-Up',skillColor:'var(--lime)',customSets:3,customTarget:4,u:'reps'},
+      {id:'fl4',name:'Straddle Half Lay',skillId:'front_lever',skillName:'Front Lever',skillColor:'var(--blue)',customSets:3,customTarget:6,u:'s'},
+    ]},
+  ],
+};
+
+// Get the guided session for a given skill + progression
+function getGuidedSession(skillId, progId){
+  const sessions=GUIDED[skillId]||[];
+  return sessions.find(s=>s.progId===progId)||sessions[0]||null;
+}
+
+// Build a routine from a guided session
+function startGuidedWorkout(skillId, progId){
+  const session=getGuidedSession(skillId,progId);
+  if(!session) return;
+  const routine={
+    id:'guided_'+Date.now(),
+    name:session.label,
+    exercises:session.exercises.map((e,i)=>({
+      ...e,
+      unit:e.u,
+      _color:CARD_COLORS[i%CARD_COLORS.length],
+    }))
+  };
+  buildWorkout(routine);
+}
+
+
 /* ─── STORAGE ──────────────────────────────────────────────── */
-const KEY='skillsapp_v5';
-let S={user:null,bests:{},history:[],routines:[],tab:'skills'};
+const KEY='skillsapp_v6';
+let S={user:null,bests:{},history:[],routines:[],tab:'skills',weights:{}};
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
-function load(){try{const d=JSON.parse(localStorage.getItem(KEY)||'{}');Object.assign(S,d)}catch(e){}}
+function load(){
+  // Migrate from v5 if it exists
+  try{
+    const old=localStorage.getItem('skillsapp_v5');
+    if(old&&!localStorage.getItem(KEY)){
+      const d=JSON.parse(old);
+      // Carry over user data but reset routines to pick up Sky
+      Object.assign(S,{
+        user:d.user||null,
+        bests:d.bests||{},
+        history:d.history||[],
+        weights:d.weights||{},
+        tab:d.tab||'skills',
+        routines:[], // reset so DEF (with Sky) gets applied fresh
+      });
+      save();
+      console.log('Migrated from v5 to v6');
+    }
+  }catch(e){}
+  try{const d=JSON.parse(localStorage.getItem(KEY)||'{}');Object.assign(S,d)}catch(e){}
+  // Always ensure Sky routine exists
+  if(!S.routines.find(r=>r.id==='sky1')){
+    const skyDef=JSON.parse(JSON.stringify(DEF.find(r=>r.id==='sky1')));
+    if(skyDef){
+      if(S.routines.length) S.routines.unshift(skyDef);
+      else S.routines=JSON.parse(JSON.stringify(DEF));
+      save();
+    }
+  }
+}
 function pb(id,v){S.bests[id]=Math.max(S.bests[id]||0,v);save()}
 
 const DEF=[
@@ -282,6 +721,9 @@ const DEF=[
     {...ALL_EX.find(e=>e.id==='mu4'),customSets:4,customTarget:8,_color:'#C8FF00'},
     {...ALL_EX.find(e=>e.id==='fl1'),customSets:4,customTarget:15,_color:'#0A84FF'},
     {...ALL_EX.find(e=>e.id==='bl2'),customSets:3,customTarget:20,_color:'#FF9F0A'},
+  ]},
+  {id:'sky1',name:'Sky Pull-Up Routine',isSkyMethod:true,skyWeight:0,exercises:[
+    {...ALL_EX.find(e=>e.id==='mu4'),customSets:5,customTarget:5,_color:'#0A84FF',unit:'reps'},
   ]},
 ];
 
@@ -379,6 +821,7 @@ function buildNav(){
   const nav=el('div',{id:'nav'});
   [{id:'skills',l:'Skills',d:'M12 2l2 6h6l-5 4 2 6-5-4-5 4 2-6-5-4h6z'},
    {id:'routines',l:'Routines',d:'M4 6h16M4 12h16M4 18h10'},
+   {id:'sky',l:'Sky',d:'M12 2C12 2 8 8 8 12a4 4 0 008 0c0-4-4-10-4-10z'},
    {id:'progress',l:'Progress',d:'M4 20V14M9 20V10M14 20V6M19 20V2'}
   ].forEach(item=>{
     const b=el('button',{class:'nav-btn'+(S.tab===item.id?' active':''),onClick:()=>showTab(item.id)});
@@ -395,6 +838,7 @@ function showTab(tab){
   tc.innerHTML='';tc.className='screen fade-in';
   if(tab==='skills')tc.appendChild(buildSkillsTab());
   if(tab==='routines')tc.appendChild(buildRoutinesTab());
+  if(tab==='sky')tc.appendChild(buildSkyTab());
   if(tab==='progress')tc.appendChild(buildProgressTab());
 }
 
@@ -437,6 +881,66 @@ function buildSkillDetail(sk){
   tip.innerHTML=`<div style="color:${sk.color};font-size:10px;font-weight:700;margin-bottom:4px;letter-spacing:1px">COACH TIP</div><div style="color:var(--sub);font-size:12px;line-height:1.6">${sk.coach}</div>`;
   hero.appendChild(tip);w.appendChild(hero);
   const list=el('div',{style:{padding:'18px 16px 40px'}});
+  // ── Guided Workout section ────────────────────────────────────────────────
+  const guidedWrap=el('div',{style:{marginBottom:'20px'}});
+  guidedWrap.appendChild(el('div',{style:{color:'var(--sub)',fontSize:'10px',letterSpacing:'3px',fontWeight:'700',marginBottom:'12px'}},'GUIDED WORKOUT'));
+
+  // Level selector — pick where you are now
+  const levelNote=el('div',{style:{color:'var(--sub)',fontSize:'12px',marginBottom:'10px'}});
+  levelNote.textContent='Select your current level to get a suggested workout:';
+  guidedWrap.appendChild(levelNote);
+
+  const progPills=el('div',{style:{display:'flex',flexWrap:'wrap',gap:'6px',marginBottom:'14px'}});
+  let selectedProgId=S.bests[sk.progs[0]?.id]?sk.progs[0].id:sk.progs[0]?.id;
+  // Try to auto-select based on bests
+  for(let i=sk.progs.length-1;i>=0;i--){
+    if(S.bests[sk.progs[i].id]){ selectedProgId=sk.progs[i].id; break; }
+  }
+
+  function renderGuidedPreview(){
+    progPills.innerHTML='';
+    sk.progs.forEach(p=>{
+      const isSelected=p.id===selectedProgId;
+      const btn=el('button',{style:{
+        padding:'5px 12px',borderRadius:'20px',fontSize:'11px',fontWeight:'600',cursor:'pointer',
+        border:`1.5px solid ${isSelected?sk.color:'var(--border)'}`,
+        background:isSelected?`color-mix(in srgb,${sk.color} 18%,transparent)`:'transparent',
+        color:isSelected?sk.color:'var(--sub)',
+        transition:'all .15s'
+      },onClick:()=>{ selectedProgId=p.id; renderGuidedPreview(); }},p.name);
+      progPills.appendChild(btn);
+    });
+
+    // Show session preview
+    previewBox.innerHTML='';
+    const session=getGuidedSession(sk.id,selectedProgId);
+    if(!session){ previewBox.style.display='none'; return; }
+    previewBox.style.display='block';
+
+    const sLabel=el('div',{style:{fontSize:'12px',fontWeight:'700',color:sk.color,marginBottom:'10px'}},session.label);
+    previewBox.appendChild(sLabel);
+    session.exercises.forEach((ex,i)=>{
+      const row=el('div',{style:{display:'flex',alignItems:'center',gap:'10px',padding:'8px 0',borderBottom:i<session.exercises.length-1?'1px solid var(--border)':'none'}});
+      const num=el('div',{style:{width:'22px',height:'22px',borderRadius:'6px',background:`color-mix(in srgb,${ex.skillColor} 20%,transparent)`,border:`1px solid color-mix(in srgb,${ex.skillColor} 40%,transparent)`,display:'flex',alignItems:'center',justifyContent:'center',fontSize:'10px',fontWeight:'800',color:ex.skillColor,flexShrink:'0'}},String(i+1));
+      const info=el('div',{style:{flex:'1'}});
+      info.appendChild(el('div',{style:{fontSize:'13px',fontWeight:'600',color:'var(--text)'}},ex.name));
+      info.appendChild(el('div',{style:{fontSize:'11px',color:'var(--sub)',marginTop:'1px'}},`${ex.customSets} sets · ${ex.customTarget}${ex.u==='s'?'s':' reps'}`));
+      row.append(num,info);
+      previewBox.appendChild(row);
+    });
+  }
+
+  const previewBox=el('div',{style:{background:'var(--card)',borderRadius:'14px',padding:'12px 14px',marginBottom:'12px',border:`1px solid var(--border)`}});
+  guidedWrap.append(progPills,previewBox);
+
+  const startGuidedBtn=el('button',{class:'btn-lime',onClick:()=>startGuidedWorkout(sk.id,selectedProgId)});
+  startGuidedBtn.innerHTML=`<svg width="16" height="16" viewBox="0 0 18 18" fill="#000"><path d="M5 3L15 9L5 15Z"/></svg>Start Guided Workout`;
+  guidedWrap.appendChild(startGuidedBtn);
+
+  renderGuidedPreview();
+  list.appendChild(guidedWrap);
+  // ── End Guided Workout section ─────────────────────────────────────────────
+
   list.appendChild(el('div',{style:{color:'var(--sub)',fontSize:'10px',letterSpacing:'3px',fontWeight:'700',marginBottom:'12px'}},'PROGRESSIONS'));
   sk.progs.forEach((p,i)=>{
     const pb2=S.bests[p.id];const lv=LV[p.lv]||LV.beginner;
@@ -475,24 +979,67 @@ function buildRoutinesTab(){
   S.routines.forEach(r=>{
     const colors=[...new Set(r.exercises.map(e=>e.skillColor))];
     const card=el('div',{class:'routine-card'});
+    if(r.isSkyMethod){
+      Object.assign(card.style,{
+        background:'linear-gradient(135deg, #0a1628 0%, #0d1f3c 60%, #0a1628 100%)',
+        border:'1.5px solid rgba(10,132,255,0.6)',
+        boxShadow:'0 4px 24px rgba(10,132,255,0.18), inset 0 1px 0 rgba(255,255,255,0.06)',
+        position:'relative',
+        overflow:'hidden',
+      });
+      // Glow accent top bar
+      const glowBar=el('div',{style:{position:'absolute',top:'0',left:'0',right:'0',height:'2px',background:'linear-gradient(90deg,transparent,#0A84FF,transparent)',opacity:'0.8'}});
+      card.appendChild(glowBar);
+    }
     const r1=el('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:'12px'}});
     const ti=el('div');
-    ti.appendChild(el('div',{style:{fontSize:'17px',fontWeight:'700',marginBottom:'6px'}},r.name));
+    const nameRow=el('div',{style:{display:'flex',alignItems:'center',gap:'8px',marginBottom:'6px'}});
+    nameRow.appendChild(el('div',{style:{fontSize:r.isSkyMethod?'19px':'17px',fontWeight:r.isSkyMethod?'900':'700',color:r.isSkyMethod?'#fff':'var(--text)',letterSpacing:r.isSkyMethod?'-0.3px':'0'}},r.name));
+    if(r.isSkyMethod){
+      const badge=el('span',{style:{background:'rgba(10,132,255,.2)',border:'1px solid rgba(10,132,255,.5)',borderRadius:'8px',padding:'2px 8px',fontSize:'10px',fontWeight:'800',color:'var(--blue)'}});
+      badge.textContent='SKY METHOD';
+      nameRow.appendChild(badge);
+    }
+    ti.appendChild(nameRow);
     const dots=el('div',{style:{display:'flex',gap:'5px',alignItems:'center'}});
     colors.forEach(c=>{const d=el('div',{style:{width:'8px',height:'8px',borderRadius:'50%',background:c}});dots.appendChild(d)});
-    dots.appendChild(el('span',{style:{color:'var(--sub)',fontSize:'11px',marginLeft:'2px'}},`${r.exercises.length} exercises`));
+    dots.appendChild(el('span',{style:{color:'var(--sub)',fontSize:'11px',marginLeft:'2px'}},`${r.exercises.length} exercise${r.exercises.length!==1?'s':''}`));
+    if(r.isSkyMethod){
+      const curW=S.weights['mu4']||r.skyWeight||0;
+      dots.appendChild(el('span',{style:{color:'var(--blue)',fontSize:'11px',fontWeight:'700',marginLeft:'6px'}},`· ${curW}kg today`));
+    }
     ti.appendChild(dots);
     const bts=el('div',{style:{display:'flex',gap:'6px'}});
-    const eb=el('button',{class:'icon-btn-r',onClick:()=>push(buildBuild(r))});
-    eb.innerHTML=`<svg width="14" height="14" viewBox="0 0 18 18" fill="none"><path d="M12 2L16 6L6 16L2 16L2 12Z" stroke="var(--sub)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+    if(!r.isSkyMethod){
+      const eb=el('button',{class:'icon-btn-r',onClick:()=>push(buildBuild(r))});
+      eb.innerHTML=`<svg width="14" height="14" viewBox="0 0 18 18" fill="none"><path d="M12 2L16 6L6 16L2 16L2 12Z" stroke="var(--sub)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+      bts.appendChild(eb);
+    }
     const db=el('button',{class:'icon-btn-del',onClick:()=>{S.routines=S.routines.filter(x=>x.id!==r.id);save();showTab('routines')}});
     db.innerHTML=`<svg width="14" height="14" viewBox="0 0 18 18" fill="none"><path d="M2 4H16M6 4V2H12V4M5 4L5.8 15H12.2L13 4" stroke="var(--red)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
-    bts.append(eb,db);r1.append(ti,bts);card.appendChild(r1);
+    bts.appendChild(db);r1.append(ti,bts);card.appendChild(r1);
     const tags=el('div',{style:{display:'flex',flexWrap:'wrap',gap:'6px',marginBottom:'14px'}});
     r.exercises.forEach(ex=>{const t=el('span',{style:{background:`color-mix(in srgb,${ex.skillColor} 15%,transparent)`,border:`1px solid color-mix(in srgb,${ex.skillColor} 30%,transparent)`,borderRadius:'8px',padding:'4px 10px',fontSize:'11px',color:ex.skillColor,fontWeight:'600'}},ex.name);tags.appendChild(t)});
     card.appendChild(tags);
-    const sb=el('button',{class:'btn-lime',onClick:()=>buildWorkout(r)});
-    sb.innerHTML=`<svg width="16" height="16" viewBox="0 0 18 18" fill="#000"><path d="M5 3L15 9L5 15Z"/></svg>Start Workout`;
+    const sb=el('button',{class:'btn-lime',onClick:()=>{
+      if(r.isSkyMethod){
+        // Always use latest weight from S.weights
+        const liveRoutine={...r,skyWeight:S.weights['mu4']||r.skyWeight||0,name:'Sky Pull-Up · '+(S.weights['mu4']||0)+'kg'};
+        liveRoutine.exercises=[{...r.exercises[0],customSets:r.exercises[0].customSets||5,customTarget:5}];
+        buildWorkout(liveRoutine);
+      } else {
+        buildWorkout(r);
+      }
+    }});
+    if(r.isSkyMethod){
+      sb.style.background='linear-gradient(135deg,#0A84FF,#005ecb)';
+      sb.style.color='#fff';
+      sb.style.boxShadow='0 4px 20px rgba(10,132,255,0.5)';
+      sb.style.fontSize='16px';
+      sb.innerHTML=`<svg width="16" height="16" viewBox="0 0 18 18" fill="white"><path d="M5 3L15 9L5 15Z"/></svg>Start Sky Workout`;
+    } else {
+      sb.innerHTML=`<svg width="16" height="16" viewBox="0 0 18 18" fill="#000"><path d="M5 3L15 9L5 15Z"/></svg>Start Workout`;
+    }
     card.appendChild(sb);w.appendChild(card);
   });
   return w;
@@ -806,6 +1353,12 @@ function buildWorkout(routine){
   let exIdx=0,setNum=1,phase='ready',timerV=0,restV=0,elapsed=0;
   let timerIv,restIv,elapsedIv,results=[];
   let editV='';
+  const bandWeights={};
+  let showingBandScreen=false;
+  // Progressive overload state
+  const sessionWeights={};   // exId -> kg used this session
+  let pendingTechCheck=null; // {ex, reps, weight, onPass, onFail}
+  let pendingWeightSuggest=null; // after tech check passes
   const startMs=Date.now();
   elapsedIv=setInterval(()=>{elapsed=Math.floor((Date.now()-startMs)/1000);const ep=$('ep');if(ep)ep.textContent=fmtT(elapsed)},1000);
   function startHold(){timerIv=setInterval(()=>{timerV++;const hc=$('hc');if(hc)hc.textContent=timerV;const tf=$('tf');const ex=routine.exercises[exIdx];if(tf&&ex)tf.style.width=Math.min(100,(timerV/(ex.customTarget||1))*100)+'%'},1000)}
@@ -815,13 +1368,253 @@ function buildWorkout(routine){
   function confirmSet(){
     const ex=routine.exercises[exIdx];const ts=ex.customSets||4;
     const v=parseInt(editV)||0;
-    results.push({exId:ex.id,exName:ex.name,skillName:ex.skillName,set:setNum,value:v,unit:ex.u,skillColor:ex.skillColor});
+    results.push({exId:ex.id,exName:ex.name,skillName:ex.skillName,set:setNum,value:v,unit:ex.u,skillColor:ex.skillColor,bandKg:bandWeights[ex.id]||0});
     pb(ex.id,v);timerV=0;
     const ls=setNum>=ts,le=exIdx>=routine.exercises.length-1;
-    if(!ls){phase='rest';setNum++;render();startRest(ex.u==='s'?90:60)}
-    else if(!le){exIdx++;setNum=1;phase='rest';render();startRest(90)}
-    else{clearAll();const dur=Math.max(1,Math.round((Date.now()-startMs)/60000));S.history.push({routineName:routine.name,date:new Date().toLocaleDateString('en-GB'),duration:dur,results});save();showTab('progress')}
+    // Save weight used this set to results for progressive overload tracking
+    if(sessionWeights[ex.id]!=null){
+      results[results.length-1].weightKg=sessionWeights[ex.id];
+    }
+    if(!ls){
+      phase='rest';setNum++;
+      const autoRest=ex.id==='mu4'?(()=>{
+        const wKg=sessionWeights[ex.id]||S.weights[ex.id]||0;
+        const lastVal=results.filter(r=>r.exId===ex.id).slice(-1)[0]?.value||5;
+        let r=180;if(wKg>20)r+=60;if(wKg>40)r+=60;if(lastVal<5&&lastVal>0)r+=60;return r;
+      })():ex.u==='s'?90:60;
+      render();startRest(autoRest);
+    }
+    else if(!le){
+      // Tech check for reps exercises before moving to next
+      const lastSetsForEx=results.filter(r=>r.exId===ex.id);
+      const avgReps=lastSetsForEx.length>0?Math.round(lastSetsForEx.reduce((s,r)=>s+r.value,0)/lastSetsForEx.length):0;
+      const wKg=sessionWeights[ex.id]||0;
+      if(ex.id==='mu4'&&avgReps>=5&&wKg>=0){
+        // Show technique check
+        showTechCheck(ex,avgReps,wKg,()=>{
+          // Tech passed — save weight + flag for next session suggestion
+          S.weights[ex.id]=wKg;
+          const lastR=results.filter(r=>r.exId===ex.id);
+          if(lastR.length) lastR[lastR.length-1].techPass=true, lastR[lastR.length-1].repsAchieved=avgReps;
+          save();
+          proceedToNextEx();
+        },()=>{
+          // Tech failed — keep same weight
+          S.weights[ex.id]=wKg;
+          save();
+          proceedToNextEx();
+        });
+      } else {
+        if(ex.id==='mu4'&&wKg>=0){ S.weights[ex.id]=wKg; const lr=results.filter(r=>r.exId===ex.id);if(lr.length)lr[lr.length-1].repsAchieved=avgReps;save(); }
+        proceedToNextEx();
+      }
+      function proceedToNextEx(){
+        exIdx++;setNum=1;phase='rest';
+        const nextEx=routine.exercises[exIdx];
+        if(nextEx){
+          showingBandScreen=true;
+          showBandScreen(nextEx,()=>{
+            showingBandScreen=false;
+            render();
+            startRest(180); // 3 min default rest between exercises
+          });
+        } else {
+          render();startRest(180);
+        }
+      }
+    } else {clearAll();const dur=Math.max(1,Math.round((Date.now()-startMs)/60000));const now=new Date();
+        const timeStr=now.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+        const dateStr=now.toLocaleDateString('en-GB');
+        const histEntry={routineName:routine.name,date:dateStr,time:timeStr,duration:dur,results};
+        if(routine.isSkyMethod){
+          histEntry.isSkySession=true;
+          histEntry.skyWeight=routine.skyWeight||0;
+          histEntry.skySets=routine.skySets||3;
+          histEntry.skyReps=routine.skyReps||3;
+        }
+        S.history.push(histEntry);save();showTab('progress')}
   }
+  function showBandScreen(ex, onContinue){
+    const tc=$('tab-content');if(!tc)return;
+    tc.innerHTML='';
+    const w=el('div',{style:{minHeight:'100vh',display:'flex',flexDirection:'column',background:'var(--bg)',padding:'52px 24px 40px',alignItems:'center',justifyContent:'center',gap:'20px'}});
+    // Title
+    w.appendChild(el('div',{style:{fontSize:'13px',fontWeight:'700',letterSpacing:'2px',color:'var(--sub)',marginBottom:'4px'}},'NEXT EXERCISE'));
+    w.appendChild(el('div',{style:{fontSize:'24px',fontWeight:'800',color:ex.skillColor,textAlign:'center',marginBottom:'4px'}},ex.name));
+    w.appendChild(el('div',{style:{color:'var(--sub)',fontSize:'13px',marginBottom:'28px'}},`${ex.customSets} sets · ${ex.customTarget}${ex.u==='s'?'s':' reps'}`));
+
+    // Band question — skip for Sky Method workouts
+    if(routine.isSkyMethod){
+      // Sky method: no band, just show weight entry and start
+      const skyW=el('div',{style:{background:'var(--card)',border:'1px solid var(--border)',borderRadius:'20px',padding:'20px',width:'100%',maxWidth:'340px',textAlign:'center'}});
+      skyW.appendChild(el('div',{style:{fontSize:'20px',fontWeight:'800',marginBottom:'4px',color:'var(--blue)'}},'Sky Method'));
+      skyW.appendChild(el('div',{style:{fontSize:'14px',color:'var(--sub)',marginBottom:'16px'}},`Today's weight: ${routine.skyWeight||0}kg`));
+      skyW.appendChild(el('div',{style:{fontSize:'13px',color:'var(--text)',lineHeight:'1.7'}},`Target: <strong>5 clean reps</strong><br>Rest: 3–5 min between sets<br>Technique check after last set`));
+      w.appendChild(skyW);
+      const goBtn=el('button',{class:'btn-lime',style:{width:'100%',maxWidth:'340px',borderRadius:'18px',padding:'16px',fontSize:'17px',marginTop:'16px'},onClick:()=>{
+        sessionWeights['mu4']=routine.skyWeight||0;
+        showingBandScreen=false;
+        onContinue();
+      }});
+      goBtn.textContent='Start';
+      w.appendChild(goBtn);
+      tc.innerHTML='';tc.appendChild(w);
+      return;
+    }
+
+    // Band question
+    const bandBox=el('div',{style:{background:'var(--card)',border:'1px solid var(--border)',borderRadius:'20px',padding:'24px',width:'100%',maxWidth:'340px'}});
+    bandBox.appendChild(el('div',{style:{fontSize:'15px',fontWeight:'700',marginBottom:'6px'}},'Use a resistance band?'));
+    bandBox.appendChild(el('div',{style:{color:'var(--sub)',fontSize:'13px',marginBottom:'20px',lineHeight:'1.5'}},'A band reduces the load, making the exercise easier. Enter how many kg of pull assistance your band provides.'));
+
+    let useBand=false;
+    let bandKg=bandWeights[ex.id]||0;
+
+    const toggle=el('div',{style:{display:'flex',gap:'10px',marginBottom:'16px'}});
+    const noBtn=el('button',{style:{flex:'1',padding:'12px',borderRadius:'14px',fontWeight:'700',fontSize:'14px',cursor:'pointer',background:'color-mix(in srgb,var(--red) 15%,transparent)',border:'2px solid var(--red)',color:'var(--red)',transition:'all .15s'},onClick:()=>{useBand=false;noBtn.style.background='color-mix(in srgb,var(--red) 25%,transparent)';yesBtn.style.background='transparent';yesBtn.style.borderColor='var(--border)';yesBtn.style.color='var(--sub)';kgRow.style.display='none';}});
+    noBtn.textContent='No band';
+    const yesBtn=el('button',{style:{flex:'1',padding:'12px',borderRadius:'14px',fontWeight:'700',fontSize:'14px',cursor:'pointer',background:'transparent',border:'2px solid var(--border)',color:'var(--sub)',transition:'all .15s'},onClick:()=>{useBand=true;yesBtn.style.background='color-mix(in srgb,var(--lime) 18%,transparent)';yesBtn.style.borderColor='var(--lime)';yesBtn.style.color='var(--lime)';noBtn.style.background='transparent';noBtn.style.borderColor='var(--border)';noBtn.style.color='var(--sub)';kgRow.style.display='flex';}});
+    yesBtn.textContent='Yes, use band';
+    toggle.append(noBtn,yesBtn);
+    bandBox.appendChild(toggle);
+
+    const kgRow=el('div',{style:{display:'none',alignItems:'center',justifyContent:'center',gap:'12px',marginBottom:'4px'}});
+    const kgMinus=el('button',{style:{width:'42px',height:'42px',borderRadius:'12px',background:'var(--surf)',border:'1px solid var(--border)',color:'var(--text)',fontSize:'22px',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center'}});
+    kgMinus.textContent='−';
+    const kgInput=el('input',{type:'number',value:String(bandKg||5),style:{width:'80px',textAlign:'center',background:'transparent',border:'none',outline:'none',color:'var(--lime)',fontSize:'32px',fontWeight:'900',fontFamily:'monospace'}});
+    const kgPlus=el('button',{style:{width:'42px',height:'42px',borderRadius:'12px',background:'var(--surf)',border:'1px solid var(--border)',color:'var(--text)',fontSize:'22px',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center'}});
+    kgPlus.textContent='+';
+    kgMinus.addEventListener('click',()=>{bandKg=Math.max(0,(parseFloat(kgInput.value)||0)-2.5);kgInput.value=bandKg;});
+    kgPlus.addEventListener('click',()=>{bandKg=(parseFloat(kgInput.value)||0)+2.5;kgInput.value=bandKg;});
+    kgInput.addEventListener('input',e=>{bandKg=parseFloat(e.target.value)||0;});
+    kgRow.append(kgMinus,kgInput,kgPlus);
+    const kgLabel=el('div',{style:{textAlign:'center',color:'var(--sub)',fontSize:'11px',letterSpacing:'1px',display:'none'}});
+    kgLabel.textContent='KG BAND PULL ASSISTANCE';
+    bandBox.append(kgRow,kgLabel);
+    kgRow.addEventListener('transitionend',()=>{});
+    // Keep kgLabel visible with kgRow
+    const origKgRowDisplay=kgRow.style.display;
+    yesBtn.addEventListener('click',()=>{kgLabel.style.display='block';},true);
+    noBtn.addEventListener('click',()=>{kgLabel.style.display='none';},true);
+
+    w.appendChild(bandBox);
+
+    // If there was a previous band weight for this exercise, pre-select yes
+    if(bandWeights[ex.id]){
+      yesBtn.click();
+      kgInput.value=bandWeights[ex.id];
+      bandKg=bandWeights[ex.id];
+    }
+
+    // ── Added weight section (reps exercises only) ────────────────────────
+    let addedKg=sessionWeights[ex.id]||S.weights[ex.id]||0;
+    const weightBox=el('div',{style:{background:'var(--card)',border:'1px solid var(--border)',borderRadius:'20px',padding:'20px',width:'100%',maxWidth:'340px',marginTop:'4px'}});
+    if(ex.id==='mu4'){
+      weightBox.appendChild(el('div',{style:{fontSize:'15px',fontWeight:'700',marginBottom:'4px'}},'Added weight'));
+      weightBox.appendChild(el('div',{style:{color:'var(--sub)',fontSize:'12px',marginBottom:'14px',lineHeight:'1.5'}},'How many kg are you adding? (belt, vest, dumbbell). Enter 0 for bodyweight only.'));
+      const wRow=el('div',{style:{display:'flex',alignItems:'center',justifyContent:'center',gap:'12px'}});
+      const wMinus=el('button',{style:{width:'42px',height:'42px',borderRadius:'12px',background:'var(--surf)',border:'1px solid var(--border)',color:'var(--text)',fontSize:'22px',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center'}});wMinus.textContent='−';
+      const wInp=el('input',{type:'number',value:String(addedKg),style:{width:'90px',textAlign:'center',background:'transparent',border:'none',outline:'none',color:'var(--lime)',fontSize:'36px',fontWeight:'900',fontFamily:'monospace'}});
+      const wPlus=el('button',{style:{width:'42px',height:'42px',borderRadius:'12px',background:'var(--surf)',border:'1px solid var(--border)',color:'var(--text)',fontSize:'22px',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center'}});wPlus.textContent='+';
+      wMinus.addEventListener('click',()=>{addedKg=Math.max(0,(parseFloat(wInp.value)||0)-2.5);wInp.value=addedKg;});
+      wPlus.addEventListener('click',()=>{addedKg=(parseFloat(wInp.value)||0)+2.5;wInp.value=addedKg;});
+      wInp.addEventListener('input',e=>{addedKg=parseFloat(e.target.value)||0;});
+      wRow.append(wMinus,wInp,wPlus);
+      weightBox.appendChild(wRow);
+      weightBox.appendChild(el('div',{style:{textAlign:'center',color:'var(--dim)',fontSize:'11px',letterSpacing:'1px',marginTop:'6px'}},'KG ADDED'));
+      // Show suggested weight if available
+      const prevWeight=S.weights[ex.id];
+      if(prevWeight!=null){
+        const prevResults=S.history.flatMap(sess=>sess.results||[]).filter(r=>r.exId===ex.id);
+        const lastSet=prevResults[prevResults.length-1];
+        if(lastSet){
+          const suggestion=el('div',{style:{marginTop:'12px',background:'rgba(200,255,0,.1)',border:'1px solid rgba(200,255,0,.3)',borderRadius:'10px',padding:'8px 12px',fontSize:'12px',color:'var(--lime)',textAlign:'center'}});
+          const suggestedKg=lastSet.repsAchieved>=5&&lastSet.techPass?prevWeight+10:lastSet.repsAchieved===0?Math.max(0,prevWeight-5):prevWeight;
+          const reason=lastSet.repsAchieved>=5&&lastSet.techPass?'5 clean reps last session → +10kg 🚀':lastSet.repsAchieved===0?'Failed last session → -5kg 💪':'Less than 5 reps → same weight 🔒';
+          suggestion.innerHTML=`<strong>Suggested: ${suggestedKg}kg</strong><br><span style="color:var(--sub);font-size:11px">${reason}</span>`;
+          const useBtn=el('button',{style:{marginTop:'8px',width:'100%',background:'rgba(200,255,0,.15)',border:'1px solid rgba(200,255,0,.4)',borderRadius:'8px',padding:'7px',color:'var(--lime)',fontSize:'12px',fontWeight:'700',cursor:'pointer'},onClick:()=>{addedKg=suggestedKg;wInp.value=addedKg;}});
+          useBtn.textContent='Use suggested weight';
+          suggestion.appendChild(useBtn);
+          weightBox.appendChild(suggestion);
+        }
+      }
+      w.appendChild(weightBox);
+    }
+
+    const startBtn=el('button',{class:'btn-lime',style:{width:'100%',maxWidth:'340px',borderRadius:'18px',padding:'16px',fontSize:'17px'},onClick:()=>{
+      if(useBand&&bandKg>0){ bandWeights[ex.id]=bandKg; }
+      else { delete bandWeights[ex.id]; }
+      if(ex.id==='mu4'){ sessionWeights[ex.id]=addedKg; }
+      showingBandScreen=false;
+      onContinue();
+    }});
+    startBtn.textContent='Start Exercise';
+    w.appendChild(startBtn);
+
+    const skipBtn=el('button',{style:{background:'transparent',border:'none',color:'var(--dim)',fontSize:'12px',cursor:'pointer',marginTop:'4px'}});
+    skipBtn.textContent='Skip this question';
+    skipBtn.addEventListener('click',()=>{showingBandScreen=false;onContinue();});
+    w.appendChild(skipBtn);
+    tc.appendChild(w);
+  }
+
+  function showTechCheck(ex, avgReps, weightKg, onPass, onFail){
+    const tc=$('tab-content');if(!tc)return;
+    tc.innerHTML='';
+    const w=el('div',{style:{minHeight:'100vh',display:'flex',flexDirection:'column',background:'var(--bg)',padding:'48px 24px 40px',alignItems:'center'}});
+    w.appendChild(el('div',{style:{fontSize:'22px',fontWeight:'800',marginBottom:'4px',textAlign:'center'}},'Technique Check'));
+    w.appendChild(el('div',{style:{color:ex.skillColor,fontWeight:'700',fontSize:'14px',marginBottom:'4px',textAlign:'center'}},ex.name));
+    w.appendChild(el('div',{style:{color:'var(--sub)',fontSize:'13px',marginBottom:'28px',textAlign:'center'}},`${avgReps} reps · ${weightKg}kg — great work! Confirm technique to progress.`));
+
+    const checks=[
+      {id:'clean',label:'Clean pull — no leg swing or kipping'},
+      {id:'chin',label:'Chin passed the bar on every rep'},
+      {id:'lockout',label:'Full elbow lockout at the bottom'},
+    ];
+    const checked=new Set();
+
+    const checksList=el('div',{style:{width:'100%',maxWidth:'360px',marginBottom:'24px'}});
+    checks.forEach(c=>{
+      const row=el('div',{style:{display:'flex',alignItems:'center',gap:'14px',padding:'14px 16px',background:'var(--card)',borderRadius:'14px',marginBottom:'8px',cursor:'pointer',border:'1px solid var(--border)',transition:'all .15s'},onClick:()=>{
+        if(checked.has(c.id)){checked.delete(c.id);row.style.borderColor='var(--border)';row.style.background='var(--card)';}
+        else{checked.add(c.id);row.style.borderColor=ex.skillColor;row.style.background=`color-mix(in srgb,${ex.skillColor} 10%,var(--card))`;}
+        passBtn.style.opacity=checked.size===checks.length?'1':'.4';
+      }});
+      const chk=el('div',{style:{width:'24px',height:'24px',borderRadius:'7px',background:'var(--surf)',border:'1.5px solid var(--border)',flexShrink:'0',display:'flex',alignItems:'center',justifyContent:'center',transition:'all .15s'}});
+      chk.innerHTML='<svg width="12" height="12" viewBox="0 0 14 14" fill="none"><path d="M2 7L5.5 10.5L12 3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+      chk.style.color='transparent';
+      row.addEventListener('click',()=>{
+        const isCk=checked.has(c.id);
+        chk.style.background=isCk?'var(--surf)':ex.skillColor;
+        chk.style.borderColor=isCk?'var(--border)':ex.skillColor;
+        chk.style.color=isCk?'transparent':'#000';
+      },true);
+      row.append(chk,el('span',{style:{fontSize:'14px',fontWeight:'500'}},c.label));
+      checksList.appendChild(row);
+    });
+    w.appendChild(checksList);
+
+    const passBtn=el('button',{class:'btn-lime',style:{width:'100%',maxWidth:'360px',borderRadius:'18px',padding:'16px',fontSize:'16px',opacity:'.4'},onClick:()=>{
+      if(checked.size<checks.length)return;
+      onPass();
+    }});
+    passBtn.innerHTML='✓ Technique was clean — advance weight next session';
+    w.appendChild(passBtn);
+
+    const failBtn=el('button',{style:{background:'transparent',border:'1px solid var(--border)',borderRadius:'14px',padding:'13px',fontSize:'14px',color:'var(--sub)',cursor:'pointer',marginTop:'10px',width:'100%',maxWidth:'360px'}},
+      el('div',{style:{fontWeight:'700',marginBottom:'3px'}},'Technique needs work'),
+      el('div',{style:{fontSize:'12px',color:'var(--dim)'}},'Weight stays the same next session')
+    );
+    failBtn.addEventListener('click',onFail);
+    w.appendChild(failBtn);
+
+    const skipBtn=el('button',{style:{background:'none',border:'none',color:'var(--dim)',fontSize:'12px',cursor:'pointer',marginTop:'12px'}});
+    skipBtn.textContent='Skip for now';
+    skipBtn.addEventListener('click',onFail);
+    w.appendChild(skipBtn);
+    tc.innerHTML='';tc.appendChild(w);
+  }
+
   function render(){
     const ex=routine.exercises[exIdx];if(!ex)return;
     const ts=ex.customSets||4,isH=ex.u==='s';
@@ -832,7 +1625,12 @@ function buildWorkout(routine){
     const bb=el('button',{class:'back-btn',style:{marginBottom:'0'},onClick:()=>{clearAll();showTab('routines')}});
     bb.innerHTML=`<svg width="18" height="18" viewBox="0 0 20 20" fill="none"><path d="M13 4L7 10L13 16" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
     const pill=el('div',{id:'ep',style:{background:'var(--surf)',border:'1px solid var(--border)',borderRadius:'20px',padding:'6px 18px',color:'var(--lime)',fontWeight:'800',fontSize:'15px',fontFamily:'monospace'}},fmtT(elapsed));
-    const fb=el('button',{class:'btn-ghost',onClick:()=>{clearAll();const dur=Math.max(1,Math.round((Date.now()-startMs)/60000));if(results.length)S.history.push({routineName:routine.name,date:new Date().toLocaleDateString('en-GB'),duration:dur,results});save();showTab('progress')}});
+    const fb=el('button',{class:'btn-ghost',onClick:()=>{clearAll();const dur=Math.max(1,Math.round((Date.now()-startMs)/60000));if(results.length){
+          const _n=new Date();
+          const _e={routineName:routine.name,date:_n.toLocaleDateString('en-GB'),time:_n.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}),duration:dur,results};
+          if(routine.isSkyMethod){_e.isSkySession=true;_e.skyWeight=routine.skyWeight||0;_e.skySets=routine.skySets||3;_e.skyReps=routine.skyReps||3;}
+          S.history.push(_e);
+        }save();showTab('progress')}});
     fb.textContent='Finish';top.append(bb,pill,fb);w.appendChild(top);
     // Rich exercise stepper
     const prog=el('div',{style:{padding:'0 16px 14px',flexShrink:'0'}});
@@ -912,10 +1710,64 @@ function buildWorkout(routine){
       ctr.appendChild(eb);
     }
     if(phase==='rest'){
-      const rd=el('div',{style:{display:'flex',flexDirection:'column',alignItems:'center',gap:'10px'}});
-      rd.appendChild(el('div',{id:'rn',class:'timer-big'},String(restV)));
+      const rd=el('div',{style:{display:'flex',flexDirection:'column',alignItems:'center',gap:'12px',width:'100%',maxWidth:'320px'}});
+
+      // ── Smart rest recommendation ──────────────────────────────────────
+      // Logic: heavier = longer rest
+      // Base: 3min. +1min if weight > 20kg added. +1min if last set < 5 reps (struggling)
+      function getSmartRest(exId){
+        const wKg=sessionWeights[exId]||S.weights[exId]||0;
+        const lastSets=results.filter(r=>r.exId===exId);
+        const lastVal=lastSets.length?lastSets[lastSets.length-1].value:5;
+        let rec=180; // 3 min base
+        if(wKg>20) rec+=60;         // heavy load → +1 min
+        if(wKg>40) rec+=60;         // very heavy → another +1 min
+        if(lastVal<5&&lastVal>0) rec+=60; // struggling → +1 min
+        return rec;
+      }
+      const smartRec=getSmartRest(ex.id);
+      const smartLabel=smartRec===180?'3min':smartRec===240?'4min':'5min';
+
+      // Big timer
+      rd.appendChild(el('div',{id:'rn',class:'timer-big',style:{color:restV<=30?'var(--orange)':ex.skillColor,transition:'color .5s'}},String(restV)));
       rd.appendChild(el('div',{style:{color:'var(--sub)',fontSize:'11px',letterSpacing:'3px'}},'REST'));
-      const sk=el('button',{class:'btn-ghost',style:{marginTop:'8px'},onClick:()=>{clearInterval(restIv);phase='ready';render()}});sk.textContent='Skip';rd.appendChild(sk);ctr.appendChild(rd);
+
+      // Smart recommendation badge
+      const recBadge=el('div',{style:{background:`color-mix(in srgb,${ex.skillColor} 12%,transparent)`,border:`1px solid color-mix(in srgb,${ex.skillColor} 35%,transparent)`,borderRadius:'20px',padding:'5px 14px',fontSize:'11px',color:ex.skillColor,fontWeight:'700',display:'flex',alignItems:'center',gap:'6px'}});
+      recBadge.innerHTML=`<svg width="11" height="11" viewBox="0 0 16 16" fill="none"><path d="M8 1v7l4 2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.5"/></svg>Recommended: ${smartLabel}`;
+      rd.appendChild(recBadge);
+
+      // Duration selector
+      const durRow=el('div',{style:{display:'flex',gap:'8px',marginTop:'2px'}});
+      [180,240,300].forEach(secs=>{
+        const isRec=secs===smartRec;
+        const isActive=restV===secs;
+        const btn=el('button',{style:{
+          flex:'1',padding:'8px 4px',borderRadius:'12px',fontSize:'12px',fontWeight:'700',cursor:'pointer',
+          border:`1.5px solid ${isActive?ex.skillColor:isRec?`color-mix(in srgb,${ex.skillColor} 40%,var(--border))`:'var(--border)'}`,
+          background:isActive?`color-mix(in srgb,${ex.skillColor} 18%,transparent)`:isRec?`color-mix(in srgb,${ex.skillColor} 8%,transparent)`:'var(--surf)',
+          color:isActive?ex.skillColor:isRec?`color-mix(in srgb,${ex.skillColor} 80%,var(--sub))`:'var(--sub)',
+          transition:'all .15s',position:'relative'
+        }});
+        btn.textContent=secs/60+'min'+(isRec?' ★':'');
+        btn.addEventListener('click',()=>{
+          clearInterval(restIv); restV=secs;
+          render();
+          restIv=setInterval(()=>{
+            restV--;
+            const rn=$('rn');
+            if(rn){rn.textContent=restV;rn.style.color=restV<=30?'var(--orange)':ex.skillColor;}
+            if(restV<=0){clearInterval(restIv);phase='ready';render();}
+          },1000);
+        });
+        durRow.appendChild(btn);
+      });
+      rd.appendChild(durRow);
+
+      const sk=el('button',{class:'btn-ghost',style:{marginTop:'4px'},onClick:()=>{clearInterval(restIv);phase='ready';render()}});
+      sk.textContent='Skip rest';
+      rd.appendChild(sk);
+      ctr.appendChild(rd);
     }
     if(phase!=='rest'&&phase!=='editing'){
       const ad=el('div',{style:{display:'flex',flexDirection:'column',alignItems:'center',gap:'14px',width:'100%'}});
@@ -924,7 +1776,9 @@ function buildWorkout(routine){
         const tb=el('div',{class:'timer-track'});const tf=el('div',{id:'tf',class:'timer-fill',style:{width:Math.min(100,(timerV/(ex.customTarget||1))*100)+'%',background:ex.skillColor}});tb.appendChild(tf);
         ad.append(hc,tb);
       }
-      if(phase==='ready'){const mb=el('button',{class:'btn-lime',style:{borderRadius:'18px',padding:'16px',fontSize:'17px'},onClick:()=>{if(isH){phase='running';render();startHold()}else stopEdit(ex.customTarget)}});mb.textContent=isH?`▶  Start Hold — Set ${setNum}`:`✓  Done — Set ${setNum} (${ex.customTarget} reps)`;ad.appendChild(mb)}
+      if(phase==='ready'){const mb=el('button',{class:'btn-lime',style:{borderRadius:'18px',padding:'16px',fontSize:'17px'},onClick:()=>{
+        if(isH){phase='running';render();startHold();}else stopEdit(ex.customTarget);
+      }});mb.textContent=isH?`▶  Start Hold — Set ${setNum}`:`✓  Done — Set ${setNum} (${ex.customTarget} reps)`;ad.appendChild(mb)}
       if(phase==='running'&&isH){const sb=el('button',{class:'stop-btn',style:{color:ex.skillColor,borderColor:ex.skillColor,background:'var(--surf)'},onClick:()=>stopEdit(timerV)});sb.textContent='■  Stop Timer';ad.appendChild(sb)}
       ctr.appendChild(ad);
     }
@@ -934,8 +1788,217 @@ function buildWorkout(routine){
   }
   const tc=$('tab-content');
   if(tc){tc.innerHTML='';tc.className='screen fade-in';}
-  render();
+  // Show band screen immediately for first exercise, before anything else
+  const firstEx=routine.exercises[0];
+  if(firstEx){
+    showingBandScreen=true;
+    showBandScreen(firstEx,()=>{
+      showingBandScreen=false;
+      render();
+    });
+  } else {
+    render();
+  }
   return el('div');
+}
+
+/* ─── SKY TAB — Dominic Sky Pull-Up Method ────────────────────────────────── */
+function buildSkyTab(){
+  const w=el('div');
+  w.appendChild(el('div',{class:'page-hdr'},
+    el('div',{class:'eyebrow'},'DOMINIC SKY METHOD'),
+    el('div',{class:'page-title'},'Pull-Up Training')
+  ));
+  const body=el('div',{style:{padding:'0 16px 40px'}});
+
+  /* ── Progressive volume logic ──────────────────────────────────────────
+     Ladder: 3×3 → 3×4 → 3×5 → 4×3 → 4×4 → 4×5 → 5×3 → 5×4 → 5×5
+     At 5×5 → suggest +10kg, reset to 3×3 at new weight
+     Each step = one session. 9 steps per 10kg block.
+     At 2-3 sessions/week: ~3-4 weeks per 10kg.
+  ──────────────────────────────────────────────────────────────────────── */
+  const LADDER=[
+    {sets:3,reps:3},{sets:3,reps:4},{sets:3,reps:5},
+    {sets:4,reps:3},{sets:4,reps:4},{sets:4,reps:5},
+    {sets:5,reps:3},{sets:5,reps:4},{sets:5,reps:5},
+  ];
+
+  // Get Sky history from S.history
+  const skyHistory=S.history.filter(s=>s.isSkySession);
+  const lastSky=skyHistory.length?skyHistory[skyHistory.length-1]:null;
+
+  // Current weight
+  const curWeight=S.weights['mu4']||0;
+
+  // Determine current ladder position from last session
+  function getLadderPos(session){
+    if(!session) return 0;
+    const sets=session.skySets||3, reps=session.skyReps||3;
+    const allPassed=session.results?.filter(r=>r.exId==='mu4').length>=sets
+      && session.results.filter(r=>r.exId==='mu4').every(r=>r.value>=reps);
+    if(!allPassed) return LADDER.findIndex(l=>l.sets===sets&&l.reps===reps);
+    const idx=LADDER.findIndex(l=>l.sets===sets&&l.reps===reps);
+    return Math.min(idx+1, LADDER.length-1);
+  }
+
+  const lastPos=getLadderPos(lastSky);
+  const lastStep=lastSky?LADDER.findIndex(l=>l.sets===(lastSky.skySets||3)&&l.reps===(lastSky.skyReps||3)):0;
+  const lastPassed=lastSky?(lastSky.results?.filter(r=>r.exId==='mu4').every(r=>r.value>=(lastSky.skyReps||3))&&lastSky.results?.filter(r=>r.exId==='mu4').length>=(lastSky.skySets||3)):false;
+
+  // If last session was 5×5 and passed → suggest weight increase
+  const suggestWeightUp=lastSky&&lastSky.skySets===5&&lastSky.skyReps===5&&lastPassed;
+  const nextStep=LADDER[lastPos];
+
+  /* ── Method explanation card ──────────────────────────────────────────── */
+  const methodCard=el('div',{style:{background:'color-mix(in srgb,var(--blue) 8%,var(--card))',border:'1px solid color-mix(in srgb,var(--blue) 30%,var(--border))',borderRadius:'20px',padding:'18px',marginBottom:'16px'}});
+  methodCard.innerHTML=`
+    <div style="color:var(--blue);font-size:11px;font-weight:700;letter-spacing:2px;margin-bottom:12px">HOW IT WORKS</div>
+    <div style="font-size:13px;color:var(--sub);line-height:1.7;margin-bottom:14px">
+      Build volume before adding weight. Each session you either complete all sets with perfect reps,
+      or stay at the same step next time. Once you reach <strong style="color:var(--text)">5 sets × 5 reps</strong>,
+      add <strong style="color:var(--lime)">+10kg</strong> and restart from 3×3.
+    </div>
+    <div style="font-size:11px;font-weight:700;color:var(--sub);letter-spacing:2px;margin-bottom:8px">THE LADDER</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:12px">
+      ${LADDER.map((l,i)=>{
+        const isCur=i===lastPos&&curWeight>0;
+        const isDone=i<lastPos&&curWeight>0;
+        return `<div style="background:${isCur?'rgba(10,132,255,.2)':isDone?'rgba(200,255,0,.1)':'var(--surf)'};border:1px solid ${isCur?'rgba(10,132,255,.6)':isDone?'rgba(200,255,0,.3)':'var(--border)'};border-radius:10px;padding:8px;text-align:center">
+          <div style="font-size:16px;font-weight:900;color:${isCur?'var(--blue)':isDone?'var(--lime)':'var(--text)'}">
+            ${l.sets}×${l.reps}${isDone?' ✓':''}${isCur?' ←':''}
+          </div>
+          <div style="font-size:9px;color:var(--dim);margin-top:2px">${l.sets} sets · ${l.reps} reps</div>
+        </div>`;
+      }).join('')}
+    </div>
+    <div style="background:rgba(200,255,0,.08);border:1px solid rgba(200,255,0,.2);border-radius:12px;padding:10px 12px;font-size:12px;color:var(--sub);line-height:1.6">
+      ⏱ <strong style="color:var(--text)">Time estimate:</strong>
+      9 sessions per +10kg block. At 2–3 sessions/week:
+      <strong style="color:var(--lime)">3–4 weeks per +10kg</strong>.
+      To reach +40kg from bodyweight: ~3–4 months.
+    </div>`;
+  body.appendChild(methodCard);
+
+  /* ── Weight section ────────────────────────────────────────────────────── */
+  const wCard=el('div',{style:{background:'var(--card)',border:'1px solid var(--border)',borderRadius:'20px',padding:'20px',marginBottom:'16px'}});
+
+  if(suggestWeightUp){
+    const upBanner=el('div',{style:{background:'rgba(200,255,0,.15)',border:'1px solid rgba(200,255,0,.4)',borderRadius:'14px',padding:'12px 16px',marginBottom:'16px',textAlign:'center'}});
+    upBanner.innerHTML=`<div style="font-size:16px;font-weight:800;color:var(--lime);margin-bottom:4px">🎉 5×5 Complete!</div>
+      <div style="font-size:13px;color:var(--sub)">You crushed 5 sets × 5 reps. Time to add <strong style="color:var(--lime)">+10kg</strong> and restart from 3×3.</div>`;
+    wCard.appendChild(upBanner);
+  }
+
+  wCard.appendChild(el('div',{style:{color:'var(--sub)',fontSize:'10px',letterSpacing:'3px',marginBottom:'12px'}},'TODAY\'S WEIGHT'));
+  let todayKg=suggestWeightUp?curWeight+10:curWeight;
+  const wDisplay=el('div',{style:{textAlign:'center',marginBottom:'16px'}});
+  const bigW=el('div',{style:{fontSize:'64px',fontWeight:'900',fontFamily:'monospace',color:'var(--blue)',lineHeight:'1',marginBottom:'4px'}},String(todayKg));
+  wDisplay.appendChild(bigW);
+  wDisplay.appendChild(el('div',{style:{color:'var(--dim)',fontSize:'11px',letterSpacing:'2px'}},'KG TOTAL'));
+  wCard.appendChild(wDisplay);
+
+  const wRow=el('div',{style:{display:'flex',alignItems:'center',justifyContent:'center',gap:'16px',marginBottom:'12px'}});
+  const wMinus=el('button',{style:{width:'52px',height:'52px',borderRadius:'14px',background:'var(--surf)',border:'1px solid var(--border)',color:'var(--text)',fontSize:'28px',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center'}});
+  wMinus.textContent='−';
+  const wInp=el('input',{type:'number',value:String(todayKg),style:{width:'100px',textAlign:'center',background:'transparent',border:'none',outline:'none',color:'var(--blue)',fontSize:'42px',fontWeight:'900',fontFamily:'monospace'}});
+  const wPlus=el('button',{style:{width:'52px',height:'52px',borderRadius:'14px',background:'var(--surf)',border:'1px solid var(--border)',color:'var(--text)',fontSize:'28px',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center'}});
+  wPlus.textContent='+';
+
+  function updateWeight(v){
+    todayKg=Math.max(0,Math.round(v*2)/2);
+    wInp.value=todayKg;bigW.textContent=todayKg;
+    S.weights['mu4']=todayKg;save();
+  }
+  wMinus.addEventListener('click',()=>updateWeight(todayKg-2.5));
+  wPlus.addEventListener('click',()=>updateWeight(todayKg+2.5));
+  wInp.addEventListener('input',e=>updateWeight(parseFloat(e.target.value)||0));
+  wRow.append(wMinus,wInp,wPlus);
+  wCard.appendChild(wRow);
+
+  if(!curWeight){
+    wCard.appendChild(el('div',{style:{textAlign:'center',fontSize:'12px',color:'var(--sub)',marginBottom:'4px'}},'Enter your starting weight above (bodyweight + added kg)'));
+  }
+  body.appendChild(wCard);
+
+  /* ── Next session suggestion ────────────────────────────────────────────── */
+  const nextCard=el('div',{style:{background:'var(--card)',border:'1px solid var(--border)',borderRadius:'20px',padding:'20px',marginBottom:'16px'}});
+  nextCard.appendChild(el('div',{style:{color:'var(--sub)',fontSize:'10px',letterSpacing:'3px',marginBottom:'12px'}},'NEXT SESSION'));
+
+  const recStep=suggestWeightUp?LADDER[0]:nextStep;
+  const nextRow=el('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between'}});
+  const nextLabel=el('div');
+  nextLabel.appendChild(el('div',{style:{fontSize:'28px',fontWeight:'900',color:'var(--blue)',lineHeight:'1'}},`${recStep.sets}×${recStep.reps}`));
+  nextLabel.appendChild(el('div',{style:{color:'var(--sub)',fontSize:'12px',marginTop:'4px'}},`${recStep.sets} sets of ${recStep.reps} reps`));
+  if(suggestWeightUp){
+    nextLabel.appendChild(el('div',{style:{color:'var(--lime)',fontSize:'12px',fontWeight:'700',marginTop:'4px'}},'New weight! Restart from 3×3'));
+  } else if(lastSky&&!lastPassed){
+    nextLabel.appendChild(el('div',{style:{color:'var(--orange)',fontSize:'12px',fontWeight:'700',marginTop:'4px'}},'Same step — keep pushing'));
+  } else if(lastSky){
+    nextLabel.appendChild(el('div',{style:{color:'var(--lime)',fontSize:'12px',fontWeight:'700',marginTop:'4px'}},'Step up from last session ↑'));
+  }
+
+  // Step indicator (1/9 ... 9/9)
+  const stepNum=LADDER.findIndex(l=>l.sets===recStep.sets&&l.reps===recStep.reps)+1;
+  const stepPill=el('div',{style:{background:'rgba(10,132,255,.15)',border:'1px solid rgba(10,132,255,.35)',borderRadius:'12px',padding:'8px 16px',textAlign:'center'}});
+  stepPill.appendChild(el('div',{style:{fontSize:'20px',fontWeight:'900',color:'var(--blue)'}},'Step '+stepNum));
+  stepPill.appendChild(el('div',{style:{fontSize:'10px',color:'var(--sub)',marginTop:'2px'}},'of 9'));
+  nextRow.append(nextLabel,stepPill);
+  nextCard.appendChild(nextRow);
+  body.appendChild(nextCard);
+
+  /* ── Recent history ─────────────────────────────────────────────────────── */
+  if(skyHistory.length){
+    const histCard=el('div',{style:{background:'var(--card)',border:'1px solid var(--border)',borderRadius:'20px',padding:'20px',marginBottom:'16px'}});
+    histCard.appendChild(el('div',{style:{color:'var(--sub)',fontSize:'10px',letterSpacing:'3px',marginBottom:'12px'}},'RECENT SESSIONS'));
+    [...skyHistory].reverse().slice(0,6).forEach((sess,i)=>{
+      const puSets=sess.results?.filter(r=>r.exId==='mu4')||[];
+      const allPassed=puSets.length>=(sess.skySets||3)&&puSets.every(r=>r.value>=(sess.skyReps||3));
+      const row=el('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'8px 0',borderBottom:i<Math.min(skyHistory.length,6)-1?'1px solid var(--border)':'none'}});
+      const left=el('div');
+      left.appendChild(el('div',{style:{fontSize:'13px',fontWeight:'600',color:i===0?'var(--text)':'var(--sub)'}},
+        `${sess.skySets||3}×${sess.skyReps||3} @ ${sess.skyWeight||0}kg`+(sess.time?' · '+sess.time:'')));
+      const setStr=puSets.map(r=>`${r.value}`).join(', ');
+      left.appendChild(el('div',{style:{fontSize:'11px',color:'var(--dim)',marginTop:'2px'}},`Sets: ${setStr} · ${sess.date}`));
+      const badge=el('div',{style:{color:allPassed?'var(--lime)':'var(--orange)',fontSize:'18px'}});
+      badge.textContent=allPassed?'✓':'○';
+      row.append(left,badge);
+      histCard.appendChild(row);
+    });
+    body.appendChild(histCard);
+  }
+
+  /* ── Start button ────────────────────────────────────────────────────────── */
+  const startBtn=el('button',{class:'btn-lime',style:{
+    width:'100%',borderRadius:'18px',padding:'18px',fontSize:'17px',
+    background:'linear-gradient(135deg,#0A84FF,#005ecb)',
+    color:'#fff',border:'none',
+    boxShadow:'0 4px 20px rgba(10,132,255,0.45)'
+  },onClick:()=>{
+    if(!todayKg){
+      const i=wInp;i.style.borderBottom='2px solid var(--red)';
+      i.focus();return;
+    }
+    const skyRoutine={
+      id:'sky_'+Date.now(),
+      name:`Sky · ${todayKg}kg · ${recStep.sets}×${recStep.reps}`,
+      isSkyMethod:true,
+      skyWeight:todayKg,
+      skySets:recStep.sets,
+      skyReps:recStep.reps,
+      exercises:[{
+        id:'mu4',name:'Pull-Up',
+        skillId:'muscle_up',skillName:'Muscle-Up',skillColor:'var(--blue)',
+        customSets:recStep.sets,customTarget:recStep.reps,
+        u:'reps',unit:'reps',_color:'var(--blue)',
+      }]
+    };
+    buildWorkout(skyRoutine);
+  }});
+  startBtn.innerHTML=`<svg width="16" height="16" viewBox="0 0 18 18" fill="white"><path d="M5 3L15 9L5 15Z"/></svg>Start: ${recStep.sets} sets × ${recStep.reps} reps`;
+  body.appendChild(startBtn);
+
+  w.appendChild(body);
+  return w;
 }
 
 /* ─── PROGRESS ──────────────────────────────────────────────── */
@@ -981,14 +2044,250 @@ function buildProgressTab(){
       });
     } else {
       if(!S.history.length){s.appendChild(el('div',{style:{color:'var(--dim)',fontSize:'14px',textAlign:'center',padding:'40px 0'}},'No sessions yet'));return}
+            // Export all history to Google Sheets
+      // Helper to show "open sheets" after export
+      function showOpenSheets(){
+        const savedUrl=localStorage.getItem('sheets_webhook');
+        const sheetsUrl=localStorage.getItem('sheets_url')||'https://sheets.new';
+        const toast=el('div',{style:{position:'fixed',bottom:'100px',left:'50%',transform:'translateX(-50%)',background:'var(--card)',border:'1px solid var(--lime)',borderRadius:'16px',padding:'14px 20px',display:'flex',alignItems:'center',gap:'12px',zIndex:'9999',boxShadow:'0 8px 32px rgba(0,0,0,.5)',whiteSpace:'nowrap'}});
+        toast.appendChild(el('span',{style:{fontSize:'20px'}},'📊'));
+        const info=el('div');
+        info.appendChild(el('div',{style:{fontSize:'13px',fontWeight:'700',marginBottom:'2px'}},'Open Google Sheets'));
+        info.appendChild(el('div',{style:{fontSize:'11px',color:'var(--sub)'}},'View your imported data'));
+        toast.appendChild(info);
+        const openBtn=el('a',{style:{background:'var(--lime)',borderRadius:'10px',padding:'8px 14px',color:'#000',fontWeight:'800',fontSize:'12px',textDecoration:'none',flexShrink:'0'}});
+        openBtn.href=sheetsUrl;openBtn.target='_blank';openBtn.textContent='Open ↗';
+        toast.appendChild(openBtn);
+        const x=el('button',{style:{background:'none',border:'none',color:'var(--sub)',fontSize:'18px',cursor:'pointer',padding:'0 0 0 8px'},onClick:()=>toast.remove()});x.textContent='×';
+        toast.appendChild(x);
+        document.body.appendChild(toast);
+        setTimeout(()=>{if(toast.parentNode)toast.remove();},8000);
+      }
+
+      // Sheets URL setter (so user can link to their specific sheet)
+      const savedSheetsUrl=localStorage.getItem('sheets_url')||'';
+      if(savedSheetsUrl){
+        const openSheetsBar=el('div',{style:{display:'flex',gap:'8px',marginBottom:'10px'}});
+        const openSheetsBtn=el('a',{style:{flex:'1',background:'rgba(15,157,88,.15)',border:'1px solid rgba(15,157,88,.4)',borderRadius:'12px',padding:'10px 14px',color:'#0f9d58',fontWeight:'700',fontSize:'13px',textDecoration:'none',display:'flex',alignItems:'center',gap:'8px'}});
+        openSheetsBtn.href=savedSheetsUrl;openSheetsBtn.target='_blank';
+        openSheetsBtn.innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="2"/><path d="M3 9h18M9 9v12" stroke="currentColor" stroke-width="2"/></svg>Open my Google Sheet ↗';
+        const editUrlBtn=el('button',{style:{background:'var(--surf)',border:'1px solid var(--border)',borderRadius:'12px',padding:'10px 14px',color:'var(--sub)',fontSize:'12px',cursor:'pointer'},onClick:()=>{
+          const newUrl=prompt('Enter your Google Sheets URL:',savedSheetsUrl);
+          if(newUrl)localStorage.setItem('sheets_url',newUrl.trim());
+          rs();
+        }});editUrlBtn.textContent='Edit';
+        openSheetsBar.append(openSheetsBtn,editUrlBtn);
+        s.appendChild(openSheetsBar);
+      } else {
+        const linkBtn=el('button',{style:{width:'100%',background:'rgba(15,157,88,.1)',border:'1px solid rgba(15,157,88,.3)',borderRadius:'12px',padding:'10px 14px',color:'#0f9d58',fontSize:'12px',fontWeight:'600',cursor:'pointer',marginBottom:'8px',display:'flex',alignItems:'center',gap:'8px',justifyContent:'center'}},
+          el('span',{},'📊'),el('span',{},'Link your Google Sheet (tap to set URL)')
+        );
+        linkBtn.addEventListener('click',()=>{
+          const url=prompt('Paste your Google Sheets URL:','');
+          if(url){localStorage.setItem('sheets_url',url.trim());rs();}
+        });
+        s.appendChild(linkBtn);
+      }
+
+      const exportBtn=el('button',{style:{width:'100%',background:'var(--surf)',border:'1px solid var(--border)',borderRadius:'14px',padding:'12px 16px',color:'var(--text)',fontSize:'13px',fontWeight:'600',cursor:'pointer',marginBottom:'16px',display:'flex',alignItems:'center',justifyContent:'center',gap:'8px'},onClick:()=>{
+        // Build CSV data
+        const rows=[['Date','Workout','Duration (min)','Exercise','Set','Result','Unit','Band (kg)']];
+        S.history.forEach(sess=>{
+          if(!sess.results?.length)return;
+          const exMap={};
+          sess.results.forEach(r=>{
+            if(!exMap[r.exId])exMap[r.exId]={name:r.exName,sets:[],bandKg:r.bandKg||0};
+            exMap[r.exId].sets.push(r);
+            if(r.bandKg)exMap[r.exId].bandKg=r.bandKg;
+          });
+          Object.values(exMap).forEach(ex=>{
+            ex.sets.forEach(r=>{
+              rows.push([sess.date,sess.routineName,String(sess.duration||''),r.exName,String(r.set),String(r.value),r.unit==='s'?'seconds':'reps',r.bandKg?String(r.bandKg):'0']);
+            });
+          });
+        });
+        const csv=rows.map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(',')).join('\n');
+
+        // Check if we have a webhook URL configured
+        const webhookUrl=localStorage.getItem('sheets_webhook');
+
+        // Show export modal
+        const overlay=el('div',{style:{position:'fixed',inset:'0',background:'rgba(0,0,0,.7)',zIndex:'9998',display:'flex',alignItems:'center',justifyContent:'center',padding:'20px'}});
+        const modal=el('div',{style:{background:'var(--card)',border:'1px solid var(--border)',borderRadius:'22px',padding:'24px',maxWidth:'340px',width:'100%',boxShadow:'0 24px 80px rgba(0,0,0,.6)'}});
+
+        modal.appendChild(el('div',{style:{fontSize:'20px',fontWeight:'800',marginBottom:'6px'}},'Export to Google Sheets'));
+        modal.appendChild(el('div',{style:{color:'var(--sub)',fontSize:'13px',lineHeight:'1.6',marginBottom:'20px'}},'Choose how to export your workout history:'));
+
+        // Option A: Download CSV
+        const csvBtn=el('button',{style:{width:'100%',background:'var(--surf)',border:'1px solid var(--border)',borderRadius:'14px',padding:'14px 16px',color:'var(--text)',fontSize:'14px',fontWeight:'600',cursor:'pointer',marginBottom:'10px',textAlign:'left',display:'flex',alignItems:'center',gap:'12px'}},
+          el('span',{style:{fontSize:'24px'}},'📥'),
+          el('div',{},el('div',{style:{fontWeight:'700'}},'Download CSV'),el('div',{style:{fontSize:'11px',color:'var(--sub)',marginTop:'2px'}},'Then import manually to any spreadsheet'))
+        );
+        csvBtn.addEventListener('click',()=>{
+          const blob=new Blob([csv],{type:'text/csv'});
+          const url=URL.createObjectURL(blob);
+          const a=document.createElement('a');a.href=url;a.download='skillsapp_history.csv';a.click();
+          URL.revokeObjectURL(url);
+          overlay.remove();
+          // Show Google Sheets button
+          showOpenSheets();
+        });
+        modal.appendChild(csvBtn);
+
+        // Option B: Send via Apps Script webhook
+        const webhookSection=el('div',{style:{background:'var(--surf)',borderRadius:'14px',border:'1px solid var(--border)',padding:'14px',marginBottom:'10px'}});
+        webhookSection.appendChild(el('div',{style:{display:'flex',alignItems:'center',gap:'8px',marginBottom:'8px'}},
+          el('span',{style:{fontSize:'20px'}},'🚀'),
+          el('div',{},
+            el('div',{style:{fontSize:'14px',fontWeight:'700'}},'Send to Google Sheets directly'),
+            el('div',{style:{fontSize:'11px',color:'var(--sub)',marginTop:'2px'}},'Requires one-time setup with Apps Script')
+          )
+        ));
+        const urlInp=el('input',{type:'url',placeholder:'Paste your Apps Script URL here...',value:webhookUrl||'',style:{width:'100%',background:'var(--card)',border:'1px solid var(--border)',borderRadius:'10px',padding:'10px 12px',color:'var(--text)',fontSize:'12px',outline:'none',marginBottom:'8px'}});
+        webhookSection.appendChild(urlInp);
+
+        const sendBtn=el('button',{style:{width:'100%',background:'var(--lime)',border:'none',borderRadius:'12px',padding:'11px',color:'#000',fontWeight:'800',fontSize:'13px',cursor:'pointer'},onClick:async()=>{
+          const url=urlInp.value.trim();
+          if(!url){urlInp.style.borderColor='var(--red)';return;}
+          localStorage.setItem('sheets_webhook',url);
+          sendBtn.textContent='Sending...';sendBtn.disabled=true;
+          try{
+            // Apps Script requires no-cors. We can't read the response,
+            // but the request still goes through if the URL is correct.
+            // Use text/plain to avoid CORS preflight (simple request)
+            await fetch(url,{
+              method:'POST',
+              mode:'no-cors',
+              headers:{'Content-Type':'text/plain'},
+              body:JSON.stringify({history:S.history})
+            });
+            // With no-cors we can't detect errors, so show success and let user verify in Sheets
+            sendBtn.textContent='✓ Sent! Check your Sheet';
+            sendBtn.style.background='#0f9d58';
+            setTimeout(()=>{overlay.remove();showOpenSheets();},1500);
+          }catch(e){
+            // Only real network errors land here
+            sendBtn.textContent='Network error — check connection';
+            sendBtn.disabled=false;
+            sendBtn.style.background='var(--red)';
+          }
+        }});
+        sendBtn.textContent='Send to Sheets';
+        webhookSection.appendChild(sendBtn);
+
+        // Setup instructions toggle
+        const setupToggle=el('button',{style:{background:'none',border:'none',color:'var(--blue)',fontSize:'11px',cursor:'pointer',marginTop:'6px',padding:'0'}});
+        setupToggle.textContent='▸ How to set up Apps Script';
+        const setupSteps=el('div',{style:{display:'none',marginTop:'8px',color:'var(--sub)',fontSize:'11px',lineHeight:'1.7',background:'var(--card)',borderRadius:'8px',padding:'10px'}});
+        setupSteps.innerHTML='1. Open <a href="https://sheets.new" target="_blank" style="color:var(--blue)">sheets.new</a> → create your sheet<br>2. Extensions → Apps Script<br>3. Paste the script (see below) → Save & Deploy → Web App<br>4. Copy the URL and paste it above';
+        setupToggle.addEventListener('click',()=>{
+          const open=setupSteps.style.display==='none';
+          setupSteps.style.display=open?'block':'none';
+          setupToggle.textContent=open?'▾ How to set up Apps Script':'▸ How to set up Apps Script';
+        });
+        webhookSection.append(setupToggle,setupSteps);
+        modal.appendChild(webhookSection);
+
+        // Script copy button
+        const scriptBox=el('div',{style:{background:'var(--surf)',borderRadius:'14px',border:'1px solid var(--border)',padding:'14px',marginBottom:'10px'}});
+        scriptBox.appendChild(el('div',{style:{fontSize:'13px',fontWeight:'700',marginBottom:'8px'}},'📋 Apps Script Code'));
+        const scriptCode=`function doPost(e){
+  const data=JSON.parse(e.postData.contents);
+  const ss=SpreadsheetApp.getActiveSpreadsheet();
+  let sheet=ss.getSheetByName('SkillsApp');
+  if(!sheet){sheet=ss.insertSheet('SkillsApp');}
+  if(sheet.getLastRow()===0){
+    sheet.appendRow(['Date','Workout','Duration (min)','Exercise','Set','Result','Unit','Band (kg)']);
+    sheet.getRange(1,1,1,8).setFontWeight('bold').setBackground('#1a73e8').setFontColor('#fff');
+  }
+  data.history.forEach(sess=>{
+    if(!sess.results)return;
+    const exMap={};
+    sess.results.forEach(r=>{
+      if(!exMap[r.exId])exMap[r.exId]={name:r.exName,sets:[],bandKg:r.bandKg||0};
+      exMap[r.exId].sets.push(r);
+      if(r.bandKg)exMap[r.exId].bandKg=r.bandKg;
+    });
+    Object.values(exMap).forEach(ex=>{
+      ex.sets.forEach(r=>{
+        sheet.appendRow([sess.date,sess.routineName,sess.duration||'',r.exName,r.set,r.value,r.unit==='s'?'seconds':'reps',r.bandKg||0]);
+      });
+    });
+  });
+  return ContentService.createTextOutput(JSON.stringify({ok:true})).setMimeType(ContentService.MimeType.JSON);
+}`;
+        const copyBtn=el('button',{style:{width:'100%',background:'var(--card)',border:'1px solid var(--border)',borderRadius:'10px',padding:'9px',color:'var(--text)',fontSize:'12px',fontWeight:'600',cursor:'pointer'},onClick:()=>{
+          navigator.clipboard?.writeText(scriptCode).then(()=>{copyBtn.textContent='✓ Copied!';setTimeout(()=>copyBtn.textContent='Copy Apps Script Code',2000);}).catch(()=>{
+            const ta=document.createElement('textarea');ta.value=scriptCode;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();copyBtn.textContent='✓ Copied!';setTimeout(()=>copyBtn.textContent='Copy Apps Script Code',2000);
+          });
+        }});
+        copyBtn.textContent='Copy Apps Script Code';
+        scriptBox.appendChild(copyBtn);
+        modal.appendChild(scriptBox);
+
+        // Cancel
+        const cancelBtn=el('button',{style:{width:'100%',background:'transparent',border:'none',color:'var(--sub)',fontSize:'13px',cursor:'pointer',padding:'8px'},onClick:()=>overlay.remove()});
+        cancelBtn.textContent='Cancel';
+        modal.appendChild(cancelBtn);
+        overlay.appendChild(modal);
+        document.body.appendChild(overlay);
+      }});
+      exportBtn.innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M8 12l4 4 4-4M12 4v12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Export to Google Sheets (CSV)';
+      s.appendChild(exportBtn);
+
       [...S.history].reverse().forEach(h=>{
         const card=el('div',{class:'hist-card'});
-        const row=el('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'10px'}});
-        row.append(el('div',{},el('div',{style:{fontSize:'15px',fontWeight:'700'}},h.routineName),el('div',{style:{color:'var(--sub)',fontSize:'11px',marginTop:'2px'}},h.date)));
-        const dur=el('div',{style:{background:'color-mix(in srgb,var(--lime) 18%,transparent)',borderRadius:'10px',padding:'4px 12px'}});
+        // Header row
+        const row=el('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:'12px'}});
+        const info=el('div');
+        info.appendChild(el('div',{style:{fontSize:'15px',fontWeight:'700'}},h.routineName));
+        const dateTime=el('div',{style:{color:'var(--sub)',fontSize:'11px',marginTop:'2px'}});
+        dateTime.textContent=h.date+(h.time?' · '+h.time:'');
+        info.appendChild(dateTime);
+        const dur=el('div',{style:{background:'color-mix(in srgb,var(--lime) 18%,transparent)',borderRadius:'10px',padding:'4px 12px',flexShrink:'0'}});
         dur.innerHTML=`<span style="color:var(--lime);font-size:13px;font-weight:800">${h.duration}min</span>`;
-        row.appendChild(dur);card.appendChild(row);
-        if(h.results?.length){const tags=el('div',{style:{display:'flex',flexWrap:'wrap',gap:'5px'}});[...new Map(h.results.map(r=>[r.exId,r])).values()].forEach(r=>{const t=el('span',{style:{background:`color-mix(in srgb,${r.skillColor} 15%,transparent)`,border:`1px solid color-mix(in srgb,${r.skillColor} 30%,transparent)`,borderRadius:'8px',padding:'3px 9px',fontSize:'10px',color:r.skillColor,fontWeight:'600'}});t.textContent=`${r.exName}: ${r.value}${r.unit==='s'?'s':''}`;tags.appendChild(t)});card.appendChild(tags)}
+        row.append(info,dur); card.appendChild(row);
+        // Detailed table per exercise
+        if(h.results?.length){
+          const exMap={};
+          h.results.forEach(r=>{if(!exMap[r.exId])exMap[r.exId]={name:r.exName,color:r.skillColor,sets:[],bandKg:r.bandKg||0};exMap[r.exId].sets.push(r);exMap[r.exId].bandKg=r.bandKg||exMap[r.exId].bandKg;});
+          Object.values(exMap).forEach(ex=>{
+            const exBlock=el('div',{style:{marginBottom:'10px'}});
+            const exHeader=el('div',{style:{display:'flex',alignItems:'center',gap:'8px',marginBottom:'5px'}});
+            exHeader.appendChild(el('span',{style:{color:ex.color,fontSize:'12px',fontWeight:'700'}},ex.name));
+            if(ex.bandKg>0){
+              const bandTag=el('span',{style:{background:'rgba(200,255,0,.15)',border:'1px solid rgba(200,255,0,.3)',borderRadius:'6px',padding:'1px 7px',fontSize:'10px',color:'var(--lime)',fontWeight:'700'}});
+              bandTag.textContent='🟢 '+ex.bandKg+'kg band';
+              exHeader.appendChild(bandTag);
+            }
+            exBlock.appendChild(exHeader);
+            // Table
+            const tbl=el('div',{style:{display:'grid',gridTemplateColumns:'auto 1fr auto',gap:'0',background:'var(--surf)',borderRadius:'10px',overflow:'hidden',border:'1px solid var(--border)'}});
+            // Header
+            ['Set','','Result'].forEach((lbl,ci)=>{
+              const hcell=el('div',{style:{padding:'5px 10px',fontSize:'9px',fontWeight:'700',letterSpacing:'1.5px',color:'var(--dim)',background:'var(--card)',borderBottom:'1px solid var(--border)',textAlign:ci===2?'right':'left'}});
+              hcell.textContent=lbl;
+              tbl.appendChild(hcell);
+            });
+            ex.sets.forEach((r,i)=>{
+              const isLast=i===ex.sets.length-1;
+              const border=isLast?'none':'1px solid var(--border)';
+              const setCell=el('div',{style:{padding:'7px 10px',fontSize:'12px',fontWeight:'700',color:'var(--sub)',borderBottom:border}});
+              setCell.textContent='Set '+r.set;
+              const sepCell=el('div',{style:{padding:'7px 0',borderBottom:border}});
+              const resCell=el('div',{style:{padding:'7px 10px',fontSize:'13px',fontWeight:'800',color:ex.color,textAlign:'right',borderBottom:border}});
+              const isPB=S.bests[r.exId]===r.value&&r.value>0;
+              resCell.textContent=r.value+(r.unit==='s'?'s':' reps')+(isPB?' ★':'');
+              tbl.append(setCell,sepCell,resCell);
+            });
+            exBlock.appendChild(tbl);
+            exBlock.appendChild(el('div',{style:{height:'2px'}}));
+            card.appendChild(exBlock);
+          });
+        }
+        s.appendChild(card);
+        // Closing of the history forEach — need to end properly
+        
         s.appendChild(card);
       });
     }
